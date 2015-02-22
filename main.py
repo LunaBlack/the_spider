@@ -182,21 +182,12 @@ class mycrawl(QtGui.QMainWindow):
         if self.spiderProcess.is_alive():
             self.spiderProcess.terminate()
 
-
-##    @QtCore.pyqtSlot()
-##    def on_
-
-
-
-
 def spiderProcess_entry(start_conn, contrl_conn, result_conn): #spider进程入口
     rule = start_conn.recv()
     start_conn.send("start crawl")
 
     the_spider = setupspider(rule, contrl_conn, result_conn) #实例化setupspider类
     the_spider.run()
-
-
 
 if __name__ == "__main__":
     print("start")
@@ -212,3 +203,4 @@ if __name__ == "__main__":
     app.exec_()
 
     sys.exit()
+
