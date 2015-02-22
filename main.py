@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
 import sys, os
@@ -15,7 +16,7 @@ from multiprocessing import Process, Pipe
 
 
 class mycrawl(QtGui.QMainWindow):
-    
+
     def __init__(self):
         super(mycrawl, self).__init__()
         ui_main = uic.loadUi("main.ui", self)
@@ -44,14 +45,14 @@ class mycrawl(QtGui.QMainWindow):
         if p_c_conn.poll(): #查询是否接收到控制信息
             c = p_c_conn.recv()
             if c == "stoped crawl":
-                stoped = True 
+                stoped = True
                 self.spiderProcess.terminate()
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
                 QtGui.QMessageBox.about(self, u"已完成", u"爬虫已完成")
 
         if not stoped:
             self.timer.singleShot(500, self.updateOutput) #500毫秒执行一次
-        
+
 
     @QtCore.pyqtSlot()
     def on_newprojectaction_triggered(self): #新建一个scrapy项目
@@ -73,7 +74,7 @@ class mycrawl(QtGui.QMainWindow):
         self.logger.info("add url")
         list_url = []
         self.addurl1 = addurl(list_url, self.logger)
-        
+
         if (self.addurl1.exec_()):
             self.logger.info("the url list that user added is: %s" %list_url)
         if list_url:
@@ -85,7 +86,7 @@ class mycrawl(QtGui.QMainWindow):
             self.logger.info("the current url list is: %s" %existed_url)
             current_url = '\n'.join(existed_url)
             self.urltextBrowser.setText(current_url)
-            
+
         self.logger.info("add url ending")
 
 
@@ -162,7 +163,7 @@ class mycrawl(QtGui.QMainWindow):
 
         log_file = open("scrapy_log.txt", "w") #清空该txt文本以记录本次运行
         log_file.close()
-        
+
         self.logger.info("start %s spider!" % self.rule)
 
         self.spiderProcess = Process(target = spiderProcess_entry, args=(c_s_conn, c_c_conn, c_r_conn)) #实例化spider进程,指向进程入口的函数
@@ -181,13 +182,6 @@ class mycrawl(QtGui.QMainWindow):
         if self.spiderProcess.is_alive():
             self.spiderProcess.terminate()
 
-
-##    @QtCore.pyqtSlot()
-##    def on_
-
-
-
-
 def spiderProcess_entry(start_conn, contrl_conn, result_conn): #spider进程入口
     rule = start_conn.recv()
     start_conn.send("start crawl")
@@ -195,19 +189,18 @@ def spiderProcess_entry(start_conn, contrl_conn, result_conn): #spider进程入�
     the_spider = setupspider(rule, contrl_conn, result_conn) #实例化setupspider类
     the_spider.run()
 
-    
-
 if __name__ == "__main__":
     print("start")
 
     p_s_conn, c_s_conn = Pipe(True) #start connection, 实例化pipe
     p_r_conn, c_r_conn = Pipe() #result connection
     p_c_conn, c_c_conn = Pipe() #control connection
-    
+
     app = QtGui.QApplication(sys.argv)
     win = mycrawl()
     win.show()
 
     app.exec_()
-    
+
     sys.exit()
+
