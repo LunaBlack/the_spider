@@ -4,8 +4,9 @@
 class ReadSetting: #读取用户设置的信息,包括起始url、url获取规则、爬取和保存参数
 
     def __init__(self): #初始化,读取包含用户设置信息的文件
-        f = open("setting.txt", 'r')
-        self.text = f.readlines()        
+        #f = open("setting.txt", 'r')
+        with open("setting.txt", 'r') as f:
+            self.text = f.readlines()
 
 
     def projectname(self): #读取项目名
@@ -16,7 +17,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                 projectname = self.text[m].strip()
                 break
         return projectname
-    
+
 
     def readurl(self): #读取起始url
         url = []
@@ -33,7 +34,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         url = list(set(url))
         return url
 
-    
+
     def readdomain(self): #读取指定的域名或路径
         domain = allow = deny = ""
 
@@ -79,7 +80,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                         url = eval(self.text[m][4:])
                     m = m + 1
                 break
-            
+
         if type(domain) == str:
             domain = [domain, ]
         else:
@@ -96,7 +97,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                 pagenumber = int(self.text[m].strip())
                 break
         return pagenumber
-   
+
 
     def itemnumber(self): #读取最大爬取条目数的参数
         itemnumber = 0
@@ -106,7 +107,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                 itemnumber = int(self.text[m].strip())
                 break
         return itemnumber
-    
+
 
     def depth(self): #读取爬取深度的参数
         depth = 0

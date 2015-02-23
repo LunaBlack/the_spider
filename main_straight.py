@@ -168,17 +168,18 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        if self.check_ready():
-            self.write_setting()
-        else:
-            return
+        #if self.check_prepared():
+        #    self.write_setting()
+        #else:
+        #    return
+        self.rule = "domain"
 
-        self.logger.info("arguments of project have been saved in setting.txt")
+        #self.logger.info("arguments of project have been saved in setting.txt")
 
         log_file = open("scrapy_log.txt", "w") #清空该txt文本以记录本次运行
         log_file.close()
 
-        self.logger.info("start %s spider!" % self.rule)
+        #self.logger.info("start %s spider!" % self.rule)
 
         self.main_conn = Pipe(True) #start connection, 实例化pipe
         self.result_conn = Pipe() #result connection
@@ -196,7 +197,6 @@ class mycrawl(QtGui.QMainWindow):
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)
-            print("++++++++")
             self.timer.start(500)
 
     @QtCore.pyqtSlot()

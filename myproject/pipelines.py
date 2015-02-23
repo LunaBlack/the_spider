@@ -22,7 +22,7 @@ class DuplicatePipeline(object): #去除重复item
 
     def __init__(self):
         self.urls_seen = set() #设置一个队列，显示已经处理过的url
-        
+
     def process_item(self, item, spider):
         if item['url'] in self.urls_seen:
             print ("Duplicate item found: %s" % item)
@@ -44,7 +44,7 @@ class CsvWriterPipeline(object): #把所有item写到csv文件里
         self.f.close()
 
     def process_item(self, item, spider):
-        self.f = open("item.csv", "a")        
+        self.f = open("item.csv", "a")
         self.f.write(item['idnumber'] + ',' + item['url'] + ',' + item['title'].encode("cp936") + '\n')
         self.f.close()
         GlobalLogging.getInstance().info("  crawled item[" + item['idnumber'] + "] " + item['title'] + " url:" + item['url'])
@@ -58,7 +58,7 @@ class FirstDownloadPipeline(object): #下载所有item对应的网页, 命名方
         self.location = rs.savinglocation()
         self.savingformat = rs.savingformat()
         self.success = 0 #成功下载页面数
-    
+
     def process_item(self, item, spider):
         try:
             page = urllib.urlopen(item['url']).read()
@@ -67,10 +67,10 @@ class FirstDownloadPipeline(object): #下载所有item对应的网页, 命名方
             downpage.write(page)
             downpage.close()
             self.success = self.success + 1
-            GlobalLogging.getInstance().info("  [success] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().info("[success] downloaded " + item['title'] + " url:" + item['url'])
             GlobalLogging.getInstance().info("[stats] downloaditem :" + str(self.success))
         except:
-            GlobalLogging.getInstance().error("  [fail] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().error("[fail] downloaded " + item['title'] + " url:" + item['url'])
         return item
 
 
@@ -82,19 +82,26 @@ class SecondDownloadPipeline(object): #下载所有item对应的网页, 命名�
         self.savingformat = rs.savingformat()
         self.projectname = rs.projectname()
         self.success = 0 #成功下载页面数
-        
+
     def process_item(self, item, spider):
         try:
+            print("process {0}".format(item['url']))
             page = urllib.urlopen(item['url']).read()
+            print("processed")
+
             path = os.path.normcase("%s/%s.%s" % (self.location, (self.projectname + "+" + item['idnumber']), self.savingformat))
-            downpage = open(path, "w")
-            downpage.write(page)
-            downpage.close()
+            #downpage = open(path, "w")
+            #downpage.write(page)
+            #downpage.close()
+            with open(path, "w") as downpage:
+                downpage.write(page)
+
             self.success = self.success + 1
-            GlobalLogging.getInstance().info("  [success] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().info("[success] downloaded " + item['title'] + " url:" + item['url'])
             GlobalLogging.getInstance().info("[stats] downloaditem :" + str(self.success))
         except:
-            GlobalLogging.getInstance().error("  [fail] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().error("[fail] downloaded " + item['title'] + " url:" + item['url'])
+
         return item
 
 
@@ -105,7 +112,7 @@ class ThirdDownloadPipeline(object): #下载所有item对应的网页, 命名方
         self.location = rs.savinglocation()
         self.savingformat = rs.savingformat()
         self.success = 0 #成功下载页面数
-    
+
     def process_item(self, item, spider):
         try:
             number = 0
@@ -116,17 +123,17 @@ class ThirdDownloadPipeline(object): #下载所有item对应的网页, 命名方
                     number = number + 1
                     filename = item['title'] + "(" + str(number) + ")"
                     continue
-                else:                
+                else:
                     page = urllib.urlopen(item['url']).read()
                     downpage = open(path, "w")
                     downpage.write(page)
                     downpage.close()
                     break
             self.success = self.success + 1
-            GlobalLogging.getInstance().info("  [success] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().info("[success] downloaded " + item['title'] + " url:" + item['url'])
             GlobalLogging.getInstance().info("[stats] downloaditem :" + str(self.success))
         except:
-            GlobalLogging.getInstance().error("  [fail] downloaded " + item['title'] + " url:" + item['url'])
+            GlobalLogging.getInstance().error("[fail] downloaded " + item['title'] + " url:" + item['url'])
         return item
 
 
@@ -136,7 +143,7 @@ class ThirdDownloadPipeline(object): #下载所有item对应的网页, 命名方
 ##
 ##    def __init__(self):
 ##        self.file = open('items.jl', 'wb')
-##        
+##
 ##    def process_item(self, item, spider):
 ##        line = json.dumps(dict(item)) + '\n'
 ##        self.file.write(line)

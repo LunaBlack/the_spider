@@ -12,18 +12,21 @@ from readsetting import ReadSetting
 
 class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
     name = "xpathspider"
-
     number = 0
-    rs = ReadSetting()
-    start_urls = rs.readurl()
-    if rs.readxpath()[0] != ['']:
-        allowed_domains = rs.readxpath()[0]
-    rules = [Rule(LinkExtractor(), follow=True, callback="parse_start_url")]
+
+    def __init__(self):
+        rs = ReadSetting()
+        self.start_urls = rs.readurl()
+        if rs.readxpath()[0] != ['']:
+            self.allowed_domains = rs.readxpath()[0]
+        self.rules = [Rule(LinkExtractor(), follow=True, callback="parse_start_url")]
+
+        super(XpathSpider, self).__init__()
 
 
     def parse_start_url(self, response):
         response.selector.remove_namespaces()
-        
+
         myitem_temp = MyprojectItem()
         myitem_temp['url'] = response.xpath(self.rs.readxpath()[1]).extract()
 
@@ -44,17 +47,17 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
             else:
                 url = myitem_temp['url']
             yield scrapy.Request(url, callback = self.parse_xpath_item)
-    
-    
+
+
 ##    def parse_xpath(self, response):
 ##        response.selector.remove_namespaces()
-##            
+##
 ##        myitem_temp = MyprojectItem()
 ##        myitem_temp['url'] = response.xpath(self.rs.readxpath()[1]).extract()
 ##
 ##        base_url = get_base_url(response)
 ##        url = ""
-##        
+##
 ##        if type(myitem_temp['url']) == list:
 ##            for e in myitem_temp['url']:
 ##                if not e.startswith("http://") and not e.startswith("https://"):
@@ -75,13 +78,13 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
     def parse_xpath_item(self, response):
         response.selector.remove_namespaces()
         self.number = self.number + 1
-        
+
         myitem = MyprojectItem()
         myitem['url'] = response.url
         myitem['idnumber'] = str(self.number)
         myitem['title'] = response.xpath("//title/text()").extract()[0].strip()
 ##        f = open("F:\Scrapy test\myproject\UI\html\item.txt", "a")
-##        f.write(myitem['url'] + '\n' + str(response.meta['depth']) + '\n')       
+##        f.write(myitem['url'] + '\n' + str(response.meta['depth']) + '\n')
         return myitem
 
 
