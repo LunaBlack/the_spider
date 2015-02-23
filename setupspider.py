@@ -6,6 +6,7 @@ from twisted.internet import reactor
 from scrapy.crawler import Crawler
 from scrapy import log, signals
 from scrapy.utils.project import get_project_settings
+
 from myproject.spiders.auto_spider import AutoSpider #此三行导入项目中spider目录下可用的spider类
 from myproject.spiders.domain_spider import DomainSpider
 from myproject.spiders.xpath_spider import XpathSpider

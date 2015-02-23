@@ -25,9 +25,10 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
 
         #if rs.readdomain()[2] != ('', ):
         if not (len(domains[2]) == 1 and domains[2][0] == ''):
-            self.rules = [Rule(LinkExtractor(allow = rs.readdomain()[1], deny = rs.readdomain()[2]), follow=True, callback="parse_domain")]
+            #self.rules = [Rule(LinkExtractor(allow = rs.readdomain()[1], deny = rs.readdomain()[2]), follow=True, callback="parse_domain")]
+            self.rules = [Rule(LinkExtractor(allow = domains[1], deny = rs.readdomain()[2]), follow=True, callback="parse_domain")]
         else:
-            self.rules = [Rule(LinkExtractor(allow = rs.readdomain()[1]), follow=True, callback="parse_domain")]
+            self.rules = [Rule(LinkExtractor(allow = domains[1]), follow=True, callback="parse_domain")]
 
         super(DomainSpider, self).__init__()
 
@@ -39,8 +40,10 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         myitem['url'] = response.url
         myitem['idnumber'] = str(self.number)
         myitem['title'] = response.xpath("//title/text()").extract()[0].strip()
+        myitem['body'] = response.body
 ##        myitem['title'] = response.xpath("//a/text()").extract()
 ##        myitem['name'] = response.xpath("//h1/text()").extract()
 ##        myitem['description'] = response.xpath("//div[@id='description']").extract()
 ##        myitem['size'] = response.xpath("//div[@id='info-left']/p[2]/text()[2]").extract
         return myitem
+

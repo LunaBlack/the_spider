@@ -12,6 +12,7 @@ class MyprojectItem(scrapy.Item):
     url = scrapy.Field()
     idnumber = scrapy.Field()
     title = scrapy.Field()
+    body = scrapy.Field()
 ##    name = scrapy.Field()
 ##    description = scrapy.Field()
 ##    size = scrapy.Field()

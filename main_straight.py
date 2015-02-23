@@ -205,6 +205,9 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
+        if self.timer.isActive():
+            self.timer.stop()
+
         try:
             if self.spiderProcess.is_alive():
                 self.spiderProcess.terminate()

@@ -85,16 +85,16 @@ class SecondDownloadPipeline(object): #下载所有item对应的网页, 命名�
 
     def process_item(self, item, spider):
         try:
-            print("process {0}".format(item['url']))
-            page = urllib.urlopen(item['url']).read()
-            print("processed")
+            #print("process {0}".format(item['url']))
+            #page = urllib.urlopen(item['url']).read()
+            #print("processed")
 
             path = os.path.normcase("%s/%s.%s" % (self.location, (self.projectname + "+" + item['idnumber']), self.savingformat))
             #downpage = open(path, "w")
             #downpage.write(page)
             #downpage.close()
             with open(path, "w") as downpage:
-                downpage.write(page)
+                downpage.write(item['body'])
 
             self.success = self.success + 1
             GlobalLogging.getInstance().info("[success] downloaded " + item['title'] + " url:" + item['url'])

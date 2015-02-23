@@ -10,6 +10,8 @@
 
 
 from readsetting import ReadSetting
+
+print("import setting.py")
 rs = ReadSetting()
 
 
