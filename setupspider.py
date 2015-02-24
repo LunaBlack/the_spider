@@ -46,7 +46,8 @@ class setupspider():
             elif log_type == "fail":
                 self.result_conn.send(s)
             elif log_type == "stats":
-                self.stats_conn.send(s)
+                #self.stats_conn.send(s)
+                pass
         else:
             print(s)
 
@@ -67,6 +68,7 @@ class setupspider():
 
 
     def stop(self):
+        self.spider.linkmatrix.store()
         if reactor.running:
             reactor.stop()
         self.contrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程

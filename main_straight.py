@@ -3,6 +3,7 @@
 
 import sys, os
 import time, logging
+from multiprocessing import Process, Pipe
 
 import scrapy
 ##from scrapy import cmdline, log, signals
@@ -11,8 +12,8 @@ from addurl import addurl
 from projectname import projectname
 from setupspider import setupspider
 
-from multiprocessing import Process, Pipe
 ##from GlobalLogging import GlobalLogging
+from linkmatrix import LinkMatrix
 
 
 class mycrawl(QtGui.QMainWindow):
@@ -215,6 +216,12 @@ class mycrawl(QtGui.QMainWindow):
                 self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
+
+    @QtCore.pyqtSlot()
+    def on_exportaction_2_triggered(self):
+        lm = LinkMatrix()
+        lm.load()
+        matrix = lm.export_matrix()
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
