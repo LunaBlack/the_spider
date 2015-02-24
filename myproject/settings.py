@@ -48,9 +48,10 @@ if rs.savingname() == 1:
                   'myproject.pipelines.CsvWriterPipeline': 400, \
                   'myproject.pipelines.FirstDownloadPipeline': 500, }
 elif rs.savingname() == 2:
-    ITEM_PIPELINES = {'myproject.pipelines.DuplicatePipeline': 300, \
-                  'myproject.pipelines.CsvWriterPipeline': 400, \
-                  'myproject.pipelines.SecondDownloadPipeline': 500, }
+    ITEM_PIPELINES = {
+            'myproject.pipelines.StatisticsPipeline': 200,
+            'myproject.pipelines.CsvWriterPipeline': 400,
+            'myproject.pipelines.SecondDownloadPipeline': 500, }
 elif rs.savingname() == 3:
     ITEM_PIPELINES = {'myproject.pipelines.DuplicatePipeline': 300, \
                   'myproject.pipelines.CsvWriterPipeline': 400, \

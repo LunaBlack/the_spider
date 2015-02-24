@@ -37,7 +37,7 @@ class mycrawl(QtGui.QMainWindow):
         s = list()
         stoped = None
 
-        while self.result_conn[0].poll(): #查询是否接收到结果信息
+        while self.result_conn[0].poll(3): #查询是否接收到结果信息
             a = self.result_conn[0].recv()
             s.append(a)
 

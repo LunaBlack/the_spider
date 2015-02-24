@@ -6,6 +6,7 @@ from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
 from myproject.items import MyprojectItem
 from readsetting import ReadSetting
+from linkmatrix import LinkMatrix
 
 
 class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定路径”
@@ -13,15 +14,19 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
     number = 0
 
     def __init__(self):
+        super(DomainSpider, self).__init__()
+
+
         rs = ReadSetting()
         self.start_urls = rs.readurl()
+        self.linkmatrix = LinkMatrix(self.start_urls)
 
         domains = rs.readdomain()
 
         #if rs.readdomain()[0] != ['']:
         #    self.allowed_domains = rs.readdomain()[0]
         if not (len(domains[0]) == 1 and domains[0][0] == ''):
-            self.allowed_domains = rs.readdomain()[0]
+            self.allowed_domains = domains[0]
 
         #if rs.readdomain()[2] != ('', ):
         if not (len(domains[2]) == 1 and domains[2][0] == ''):
@@ -30,7 +35,6 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         else:
             self.rules = [Rule(LinkExtractor(allow = domains[1]), follow=True, callback="parse_domain")]
 
-        super(DomainSpider, self).__init__()
 
     def parse_domain(self, response):
         response.selector.remove_namespaces()
@@ -41,9 +45,7 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         myitem['idnumber'] = str(self.number)
         myitem['title'] = response.xpath("//title/text()").extract()[0].strip()
         myitem['body'] = response.body
-##        myitem['title'] = response.xpath("//a/text()").extract()
-##        myitem['name'] = response.xpath("//h1/text()").extract()
-##        myitem['description'] = response.xpath("//div[@id='description']").extract()
-##        myitem['size'] = response.xpath("//div[@id='info-left']/p[2]/text()[2]").extract
+        myitem['referer'] = response.request.headers['Referer']
+
         return myitem
 

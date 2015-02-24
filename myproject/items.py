@@ -13,6 +13,7 @@ class MyprojectItem(scrapy.Item):
     idnumber = scrapy.Field()
     title = scrapy.Field()
     body = scrapy.Field()
+    referer = scrapy.Field()
 ##    name = scrapy.Field()
 ##    description = scrapy.Field()
 ##    size = scrapy.Field()

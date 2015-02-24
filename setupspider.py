@@ -38,6 +38,7 @@ class setupspider():
 
 
     def getLog(self, s): #将结果信息传给主进程
+        print(s)
         if s.startswith("INFO"):
             log_type = s[s.index('[')+1 : s.index(']')]
             if log_type == "success":

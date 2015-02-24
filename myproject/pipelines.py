@@ -85,10 +85,7 @@ class SecondDownloadPipeline(object): #下载所有item对应的网页, 命名�
 
     def process_item(self, item, spider):
         try:
-            #print("process {0}".format(item['url']))
             #page = urllib.urlopen(item['url']).read()
-            #print("processed")
-
             path = os.path.normcase("%s/%s.%s" % (self.location, (self.projectname + "+" + item['idnumber']), self.savingformat))
             #downpage = open(path, "w")
             #downpage.write(page)
@@ -136,7 +133,19 @@ class ThirdDownloadPipeline(object): #下载所有item对应的网页, 命名方
             GlobalLogging.getInstance().error("[fail] downloaded " + item['title'] + " url:" + item['url'])
         return item
 
+class StatisticsPipeline(object):
 
+    def __init__(self):
+        print('+StatisticsPipeline')
+
+    def process_item(self, item, spider):
+        print('StatisticsPipeline')
+
+        if spider.linkmatrix.addLink(item['url'], item['referer']):
+            #print ("Duplicate item found: %s" % item)
+            raise DropItem("Duplicate item found: %s" % item)
+        else:
+            return item
 
 
 ##class JsonWriterPipeline(object):
