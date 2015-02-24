@@ -14,8 +14,6 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
     number = 0
 
     def __init__(self):
-        super(DomainSpider, self).__init__()
-
 
         rs = ReadSetting()
         self.start_urls = rs.readurl()
@@ -34,6 +32,8 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
             self.rules = [Rule(LinkExtractor(allow = domains[1], deny = rs.readdomain()[2]), follow=True, callback="parse_domain")]
         else:
             self.rules = [Rule(LinkExtractor(allow = domains[1]), follow=True, callback="parse_domain")]
+
+        super(DomainSpider, self).__init__()
 
 
     def parse_domain(self, response):
