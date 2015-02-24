@@ -210,7 +210,9 @@ class mycrawl(QtGui.QMainWindow):
 
         try:
             if self.spiderProcess.is_alive():
-                self.spiderProcess.terminate()
+                #self.spiderProcess.terminate()
+                print("send signal 9")
+                self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
 
@@ -231,4 +233,5 @@ if __name__ == "__main__":
     app.exec_()
 
     sys.exit()
+    print("exit")
 

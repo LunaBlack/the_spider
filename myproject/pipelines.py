@@ -44,6 +44,8 @@ class CsvWriterPipeline(object): #把所有item写到csv文件里
         self.f.close()
 
     def process_item(self, item, spider):
+        #print("CsvWriterPipeline", spider.name)
+
         self.f = open("item.csv", "a")
         self.f.write(item['idnumber'] + ',' + item['url'] + ',' + item['title'].encode("cp936") + '\n')
         self.f.close()
@@ -139,7 +141,7 @@ class StatisticsPipeline(object):
         print('+StatisticsPipeline')
 
     def process_item(self, item, spider):
-        print('StatisticsPipeline')
+        print('StatisticsPipeline', spider.name)
 
         if spider.linkmatrix.addLink(item['url'], item['referer']):
             #print ("Duplicate item found: %s" % item)
@@ -147,18 +149,3 @@ class StatisticsPipeline(object):
         else:
             return item
 
-
-##class JsonWriterPipeline(object):
-##
-##    def __init__(self):
-##        self.file = open('items.jl', 'wb')
-##
-##    def process_item(self, item, spider):
-##        line = json.dumps(dict(item)) + '\n'
-##        self.file.write(line)
-##        return item
-
-
-##class MyprojectPipeline(object):
-##    def process_item(self, item, spider):
-##        return item
