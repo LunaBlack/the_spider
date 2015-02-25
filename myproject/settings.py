@@ -44,6 +44,8 @@ REDIRECT_ENABLED = True
 
 STATS_CLASS = 'statscollect.SpiderStatsCollector' #设置状态收集器
 
+#JOBDIR = 'crawls/{0}'.format(BOT_NAME)
+
 
 ITEM_PIPELINES = {
         'myproject.pipelines.StatisticsPipeline': 300,

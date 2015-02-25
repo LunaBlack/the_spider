@@ -11,10 +11,6 @@ from myproject.spiders.auto_spider import AutoSpider #此三行导入项目中sp
 from myproject.spiders.domain_spider import DomainSpider
 from myproject.spiders.xpath_spider import XpathSpider
 
-#import myproject.spiders.auto_spider
-#import myproject.spiders.domain_spider
-#import myproject.spiders.xpath_spider
-
 from GlobalLogging import GlobalLogging
 
 
@@ -54,13 +50,26 @@ class setupspider():
         if self.ctrl_conn.poll(): #查询是否接收到控制信息
             c = self.ctrl_conn.recv()
             if c == 'stop crawl':
-#                print("""
-#=============================received stop==================================""")
+                print("""
+=============================received stop==================================""")
                 self.crawler.stop()
             elif c == 'pause crawl':
+                print("""
+=============================received pause==================================""")
                 self.crawler.engine.pause()
-            elif c == 'unpause crawl':
-                self.crawler.engine.unpause()
+                while 1:
+                    if self.ctrl_conn.poll(1):
+                        c = self.ctrl_conn.recv()
+                        if c == 'unpause crawl':
+                            print("""
+=============================received unpause==================================""")
+                            self.crawler.engine.unpause()
+                            break
+                        elif c == 'stop crawl':
+                            print("""
+=============================received stop==================================""")
+                            self.crawler.stop()
+                            break
 
 
     def run(self):

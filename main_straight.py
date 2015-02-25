@@ -211,13 +211,14 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_pauseButton_clicked(self):
-
         if self.running:
+            self.running = not self.running
             self.pauseButton.setText("continue")
-            self.ctrl_conn[0].send('unpause crawl')
-        else:
-            self.pauseButton.setText("pause")
             self.ctrl_conn[0].send('pause crawl')
+        else:
+            self.running = not self.running
+            self.pauseButton.setText("pause")
+            self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
