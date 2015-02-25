@@ -64,6 +64,7 @@ class mycrawl(QtGui.QMainWindow):
                 stoped = True
                 self.spiderProcess.terminate()
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
+                self.statusLabel.setText(u"已完成") #改变运行状态Label
                 QtGui.QMessageBox.about(self, u"已完成", u"爬虫已完成")
 
         if stoped:
@@ -213,11 +214,13 @@ class mycrawl(QtGui.QMainWindow):
     def on_pauseButton_clicked(self):
         if self.running:
             self.running = not self.running
-            self.pauseButton.setText("continue")
+            self.pauseButton.setText(u"恢复")
+            self.statusLabel.setText(u"暂停") #改变运行状态Label
             self.ctrl_conn[0].send('pause crawl')
         else:
             self.running = not self.running
-            self.pauseButton.setText("pause")
+            self.pauseButton.setText(u"暂停")
+            self.statusLabel.setText(u"正在运行") #改变运行状态Label
             self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
