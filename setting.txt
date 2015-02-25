@@ -1,18 +1,19 @@
 
 
 project name: 
-im
+wlv
 
 initial url: 
-http://im.nju.edu.cn
+http://cybermetrics.wlv.ac.uk
+http://linkanalysis.wlv.ac.uk
+http://socscibot.wlv.ac.uk
 
 rule: 
 domain
 
 domain: 
-allowed_domains=('im.nju.edu.cn')
-allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')
-deny=('shownodir\.aspx')
+allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
+
 
 largest number of pages: 
 1000

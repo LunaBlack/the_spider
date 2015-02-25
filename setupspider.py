@@ -21,7 +21,7 @@ from GlobalLogging import GlobalLogging
 class setupspider():
     def __init__(self, rule, contrl_conn, result_conn, stats_conn):
         self.rule = rule
-        self.contrl_conn = contrl_conn
+        self.ctrl_conn = contrl_conn
         self.result_conn = result_conn
         self.stats_conn = stats_conn
 
@@ -47,12 +47,26 @@ class setupspider():
                 self.result_conn.send(s)
             elif log_type == "stats":
                 #self.stats_conn.send(s)
+                print(s)
                 pass
         else:
             print(s)
 
+        if self.ctrl_conn.poll(): #查询是否接收到控制信息
+            c = self.ctrl_conn.recv()
+            if c == 'stop crawl':
+#                print("""
+#=============================received stop==================================""")
+                self.crawler.stop()
+            elif c == 'pause crawl':
+                self.crawler.engine.pause()
+            elif c == 'unpause crawl':
+                self.crawler.engine.unpause()
+
 
     def run(self):
+        log.start(logfile = "scrapy_log.txt", loglevel = "INFO", logstdout = False)
+
         if self.rule == "auto":
             self.spider = AutoSpider()   #创建一个auto_spider的爬虫实例
         elif self.rule == "domain":
@@ -62,7 +76,6 @@ class setupspider():
 
         if self.spider:
             self.crawler.crawl(self.spider)
-            log.start(logfile = "scrapy_log.txt", loglevel = "DEBUG", logstdout = False)
             self.crawler.start()
             reactor.run()
 
@@ -71,5 +84,5 @@ class setupspider():
         self.spider.linkmatrix.store()
         if reactor.running:
             reactor.stop()
-        self.contrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程
+        self.ctrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程
 

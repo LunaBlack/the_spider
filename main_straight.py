@@ -38,7 +38,7 @@ class mycrawl(QtGui.QMainWindow):
         s = list()
         stoped = None
 
-        while self.result_conn[0].poll(3): #查询是否接收到结果信息
+        while self.result_conn[0].poll(): #查询是否接收到结果信息
             a = self.result_conn[0].recv()
             s.append(a)
 
@@ -169,10 +169,6 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        #if self.check_prepared():
-        #    self.write_setting()
-        #else:
-        #    return
         self.rule = "domain"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
@@ -187,22 +183,31 @@ class mycrawl(QtGui.QMainWindow):
         self.ctrl_conn = Pipe() #control connection
         self.state_conn = Pipe() #state connection
 
-        #实例化spider进程,指向进程入口的函数
         self.spiderProcess = Process(target = spiderProcess_entry, args=(self.main_conn[1], self.ctrl_conn[1], self.result_conn[1], self.state_conn[1]))
         self.spiderProcess.start()
 
         self.tabWidget.setCurrentIndex(1)
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
-        #QtGui.QMessageBox.about(self, u"开始", u"开始爬取")
 
+        self.running = True
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
+    def on_pauseButton_clicked(self):
+
+        if self.running:
+            self.pauseButton.setText("continue")
+            self.ctrl_conn[0].send('unpause crawl')
+        else:
+            self.pauseButton.setText("pause")
+            self.ctrl_conn[0].send('pause crawl')
+
+    @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
-        pass
+        self.ctrl_conn[0].send('stop crawl')
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
@@ -211,9 +216,12 @@ class mycrawl(QtGui.QMainWindow):
 
         try:
             if self.spiderProcess.is_alive():
-                #self.spiderProcess.terminate()
-                print("send signal 9")
-                self.spiderProcess.send_signal(9)
+                self.spiderProcess.terminate()
+                time.sleep(3)
+                if self.spiderProcess.is_alive():
+                    print("""
+===========================send signal 9==================================""")
+                    self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
 

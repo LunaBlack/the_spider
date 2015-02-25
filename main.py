@@ -3,6 +3,7 @@
 
 import sys, os
 import time, logging
+from multiprocessing import Process, Pipe
 
 import scrapy
 ##from scrapy import cmdline, log, signals
@@ -11,8 +12,8 @@ from addurl import addurl
 from projectname import projectname
 from setupspider import setupspider
 
-from multiprocessing import Process, Pipe
 ##from GlobalLogging import GlobalLogging
+from linkmatrix import LinkMatrix
 
 
 class mycrawl(QtGui.QMainWindow):
@@ -196,20 +197,33 @@ class mycrawl(QtGui.QMainWindow):
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)
-            print("++++++++")
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
-        pass
+        self.ctrl_conn[0].send('stop crawl')
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
+        if self.timer.isActive():
+            self.timer.stop()
+
         try:
             if self.spiderProcess.is_alive():
                 self.spiderProcess.terminate()
+                time.sleep(3)
+                if self.spiderProcess.is_alive():
+                #self.spiderProcess.terminate()
+                print("send signal 9")
+                self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
+
+    @QtCore.pyqtSlot()
+    def on_exportaction_2_triggered(self):
+        lm = LinkMatrix()
+        lm.load()
+        matrix = lm.export_matrix()
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
@@ -228,4 +242,5 @@ if __name__ == "__main__":
     app.exec_()
 
     sys.exit()
+    print("exit")
 
