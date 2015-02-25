@@ -46,8 +46,7 @@ class setupspider():
             elif log_type == "fail":
                 self.result_conn.send(s)
             elif log_type == "stats":
-                #self.stats_conn.send(s)
-                print(s)
+                self.stats_conn.send(s)
                 pass
         else:
             print(s)

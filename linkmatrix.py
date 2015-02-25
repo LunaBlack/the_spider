@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import cPickle as pickle
+import pprint
 
 class LinkMatrix():
 
@@ -15,16 +16,18 @@ class LinkMatrix():
             self.forwardlinks.setdefault(e, dict())
 
     def addLink(self, url, referer):
-        #print(url, referer)
         try:
             if self.forwardlinks[referer].setdefault(url, 0):
                 self.forwardlinks[referer][url] += 1
                 return True
             else:
                 self.forwardlinks[referer][url] += 1
+                self.forwardlinks.setdefault(url, dict())
                 return False
         except KeyError:
-            pass
+            print(url, referer)
+            pprint.pprint(self.forwardlinks)
+            return False
 
     def store(self):
         with open("linkgraph", "w") as f:

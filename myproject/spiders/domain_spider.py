@@ -12,7 +12,6 @@ from linkmatrix import LinkMatrix
 
 class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定路径”
     name = "domainspider"
-    number = 0
 
     def __init__(self):
 
@@ -24,25 +23,21 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         domains = rs.readdomain()
         self.allowed_domains = domains[0]
 
-        self.rules = [Rule( LinkExtractor(
-            allow = domains[1],
-            deny = domains[2],
-            allow_domains = domains[0]
-            ),
+        self.rules = [Rule( LinkExtractor(allow = domains[1], deny = domains[2]),
             follow=True, callback="parse_domain")]
 
         super(DomainSpider, self).__init__()
 
 
     def parse_domain(self, response):
+        self.log('receive response from {0}'.format(response.url), log.INFO)
         myitem = MyprojectItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
+        if 'redirect_urls' in response.meta:
+            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), log.INFO)
         try:
             response.selector.remove_namespaces()
-            self.number = self.number + 1
-    ##        self.log('A response from %s just arrived!' % response.url)
-            myitem['idnumber'] = str(self.number)
             title_exp = response.xpath("//title/text()").extract()
             if title_exp:
                 myitem['title'] = title_exp[0].strip()

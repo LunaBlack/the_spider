@@ -45,6 +45,21 @@ class mycrawl(QtGui.QMainWindow):
         if s:
             self.resultplainTextEdit.appendPlainText('\n'.join(s))
 
+        while self.state_conn[0].poll(): #查询是否接收到状态信息
+            a = self.state_conn.recv()
+            if a.endswith("downloader/request_count:"):
+                self.requestcountLabel.setText(a[64:].strip()) #改变请求页面数
+            elif a.endswith("downloader/response_count:"):
+                self.responsecountLabel.setText(a[65:].strip()) #改变响应页面数
+            elif a.endswith("downloader/response_bytes:"):
+                self.responsebytesLabel.setText(a[65:].strip()) #改变响应字节数
+            elif a.endswith("downloader/response_status_count/200:"):
+                self.response200countLabel.setText(a[76:].strip()) #改变成功响应页面数(200)
+            elif a.endswith("item_scraped_count:"):
+                self.itemscrapedLabel.setText(a[58:].strip()) #改变抓取条目数
+            elif a.endswith("downloaditem :"):
+                self.itemdownloadLabel.setText(a[27:].strip()) #改变成功下载条目数
+
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
             c = self.ctrl_conn[0].recv()
             if c == "stoped crawl":
@@ -200,6 +215,16 @@ class mycrawl(QtGui.QMainWindow):
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
+    def on_pauseButton_clicked(self):
+
+        if self.running:
+            self.pauseButton.setText("continue")
+            self.ctrl_conn[0].send('unpause crawl')
+        else:
+            self.pauseButton.setText("pause")
+            self.ctrl_conn[0].send('pause crawl')
+
+    @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
         self.ctrl_conn[0].send('stop crawl')
 
@@ -213,9 +238,9 @@ class mycrawl(QtGui.QMainWindow):
                 self.spiderProcess.terminate()
                 time.sleep(3)
                 if self.spiderProcess.is_alive():
-                #self.spiderProcess.terminate()
-                print("send signal 9")
-                self.spiderProcess.send_signal(9)
+                    print("""
+===========================send signal 9==================================""")
+                    self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
 

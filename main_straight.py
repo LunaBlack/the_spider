@@ -1,12 +1,10 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys
 import time, logging
 from multiprocessing import Process, Pipe
 
-import scrapy
-##from scrapy import cmdline, log, signals
 from PyQt4 import QtCore, QtGui, uic
 from addurl import addurl
 from projectname import projectname
@@ -44,6 +42,21 @@ class mycrawl(QtGui.QMainWindow):
 
         if s:
             self.resultplainTextEdit.appendPlainText('\n'.join(s))
+
+        while self.state_conn[0].poll(): #查询是否接收到状态信息
+            a = self.state_conn[0].recv()
+            if "downloader/request_count:" in a:
+                self.requestcountLabel.setText(a[64:].strip()) #改变请求页面数
+            elif "downloader/response_count:" in a:
+                self.responsecountLabel.setText(a[65:].strip()) #改变响应页面数
+            elif "downloader/response_bytes:" in a:
+                self.responsebytesLabel.setText(a[65:].strip()) #改变响应字节数
+            elif "downloader/response_status_count/200:" in a:
+                self.response200countLabel.setText(a[76:].strip()) #改变成功响应页面数(200)
+            elif "item_scraped_count:" in a:
+                self.itemscrapedLabel.setText(a[58:].strip()) #改变抓取条目数
+            elif "downloaditem :" in a:
+                self.itemdownloadLabel.setText(a[27:].strip()) #改变成功下载条目数
 
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
             c = self.ctrl_conn[0].recv()
@@ -187,9 +200,10 @@ class mycrawl(QtGui.QMainWindow):
         self.spiderProcess.start()
 
         self.tabWidget.setCurrentIndex(1)
+        self.running = True
+        self.statusLabel.setText(u"正在运行") #改变运行状态Label
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
 
-        self.running = True
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)

@@ -40,14 +40,21 @@ COOKIES_ENABLED = False #禁止cookies
 
 AJAXCRAWL_ENABLED = True #启用“Ajax Crawlable Pages”爬取
 
+REDIRECT_ENABLED = True
+
 STATS_CLASS = 'statscollect.SpiderStatsCollector' #设置状态收集器
 
 
 ITEM_PIPELINES = {
         'myproject.pipelines.StatisticsPipeline': 300,
-        'myproject.pipelines.SavePipeline': 500, }
+        'myproject.pipelines.SavePipeline': 500,
+        }
 
-
+SPIDER_MIDDLEWARES = {
+        'myproject.spidermiddlewares.OffsiteMiddleware': 543,
+        'scrapy.contrib.spidermiddleware.offsite.OffsiteMiddleware': None,
+        }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'myproject (+http://www.yourdomain.com)'
+
