@@ -12,8 +12,10 @@ class LinkMatrix():
     def setroot(self, root):
         self.root = root
         self.forwardlinks = dict()
+        self.outlinks = dict()
         for e in root:
             self.forwardlinks.setdefault(e, dict())
+            self.outlinks.setdefault(e, set())
 
     def addLink(self, url, referer):
         try:
@@ -23,7 +25,16 @@ class LinkMatrix():
             else:
                 self.forwardlinks[referer][url] += 1
                 self.forwardlinks.setdefault(url, dict())
+                self.outlinks.setdefault(url, set())
                 return False
+        except KeyError:
+            print(url, referer)
+            pprint.pprint(self.forwardlinks)
+            return False
+
+    def addOutLink(self, url, referer):
+        try:
+            self.outlinks[referer].add(url)
         except KeyError:
             print(url, referer)
             pprint.pprint(self.forwardlinks)
@@ -32,10 +43,14 @@ class LinkMatrix():
     def store(self):
         with open("linkgraph", "w") as f:
             pickle.dump(self.forwardlinks, f)
+        with open("outlinkgraph", "w") as f:
+            pickle.dump(self.outlinks, f)
 
     def load(self):
         with open("linkgraph", "r") as f:
             self.forwardlinks = pickle.load(f)
+        with open("outlinkgraph", "r") as f:
+            self.outlinks = pickle.load(f)
 
     def export_matrix(self):
         pass

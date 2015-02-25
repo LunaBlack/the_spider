@@ -28,9 +28,10 @@ class OffsiteMiddleware(object):
                     domain = urlparse_cached(x).hostname
                     if domain and domain not in self.domains_seen:
                         self.domains_seen.add(domain)
+                        self.stats.inc_value('offsite/domains', spider=spider)
                         log.msg(format="Filtered offsite request to %(domain)r: %(request)s",
                                 level=log.DEBUG, spider=spider, domain=domain, request=x)
-                        self.stats.inc_value('offsite/domains', spider=spider)
+                    spider.linkmatrix.addOutLink(x.url, x.headers['Referer'])
                     self.stats.inc_value('offsite/filtered', spider=spider)
             else:
                 yield x
