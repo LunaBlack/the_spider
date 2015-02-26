@@ -142,7 +142,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         for n,i in enumerate(self.text):
             if i.startswith("location of saving:"):
                 m = n + 1
-                savinglocation = self.text[m].strip()
+                savinglocation = unicode(self.text[m].strip(), 'utf8')
                 break
         return savinglocation
 

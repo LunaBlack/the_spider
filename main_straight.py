@@ -146,6 +146,7 @@ class mycrawl(QtGui.QMainWindow):
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
+
     def check_ready(self):
         if self.projectnameLabel.text() == u"（未创建）": #判断是否创建了项目
             QtGui.QMessageBox.about(self, u"未创建项目", u"请新建一个项目，点击文件菜单新建项目")
@@ -164,6 +165,7 @@ class mycrawl(QtGui.QMainWindow):
         else:
             return True
 
+
     def write_setting(self):
         with open("setting.txt", 'w') as f:
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
@@ -180,6 +182,7 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nlocation of saving: \n" + self.savelocationlineEdit.text().toUtf8())
             f.write("\n\nformat of saving: \n" + self.saveformatcomboBox.currentText())
             f.write("\n\nnaming of saving: \n" + self.namingcomboBox.currentText().toUtf8())
+
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
@@ -209,6 +212,7 @@ class mycrawl(QtGui.QMainWindow):
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)
             self.timer.start(500)
+
 
     @QtCore.pyqtSlot()
     def on_pauseButton_clicked(self):

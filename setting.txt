@@ -28,7 +28,7 @@ longest time of requesting:
 180
 
 location of saving: 
-/home/skt/darling/the_spider/html
+/home/skt/测试
 
 format of saving: 
 html
