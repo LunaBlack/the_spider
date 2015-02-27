@@ -55,14 +55,14 @@ class setupspider():
                 self.crawler.stop()
             elif c == 'pause crawl':
                 print("""
-=============================received pause==================================""")
+=============================received pause=================================""")
                 self.crawler.engine.pause()
                 while 1:
                     if self.ctrl_conn.poll(1):
                         c = self.ctrl_conn.recv()
                         if c == 'unpause crawl':
                             print("""
-=============================received unpause==================================""")
+=============================received unpause===============================""")
                             self.crawler.engine.unpause()
                             break
                         elif c == 'stop crawl':
@@ -89,8 +89,9 @@ class setupspider():
 
 
     def stop(self):
-        self.spider.linkmatrix.store()
         if reactor.running:
             reactor.stop()
+
+        self.spider.linkmatrix.store()
         self.ctrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程
 
