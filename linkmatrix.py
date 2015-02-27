@@ -66,18 +66,20 @@ class LinkMatrix():
             self.roots, self.forwardlinks, self.outlinks = pickle.load(f)
 
     def export_matrix(self):
-        page_count, out_count = self.pages_and_links_count()
+        pages_count = self.pages_and_links_count()
         with codecs.open("page and link counts.csv", "w", "cp936") as f:
-            fields = ["Site", "Pages", "Outlinks"]
+            fields = ["Site", "Pages", "InterLinks" "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k in page_count.keys():
-                row = {fields[0]:k, fields[1]:page_count[k], fields[2]:out_count[k]}
+            for k,v in pages_count.items():
+                print(v)
+                row = {fields[0]:k}
+                row.update(v)
                 print(row)
                 writer.writerow(row)
 
         page_fromto_count = self.page_count_fromto()
-        with codecs.open("file document counts from-to.csv", "w", "cp936") as f:
+        with codecs.open("page counts from-to1.csv", "w", "cp936") as f:
             fields = ["From", "To", "File Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -86,6 +88,18 @@ class LinkMatrix():
                     row = {fields[0]:k, fields[1]:e, fields[2]:c}
                     print(row)
                     writer.writerow(row)
+
+        with codecs.open("page counts from-to2.csv", "w", "cp936") as f:
+            fields =["sites"] + [e for e in page_fromto_count.keys()]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k, v in page_fromto_count.items():
+                row = {"sites":k}
+                row.update(v)
+                for e in page_fromto_count.keys():
+                    row.setdefault(e, 0)
+                print(row)
+                writer.writerow(row)
 
     def iter_dfs(self, links, root):
         accessed, queue = set(), []
@@ -99,39 +113,32 @@ class LinkMatrix():
             yield u
 
     def pages_and_links_count(self):
-        #def find_root(link):
-        #    for e in self.iter_dfs(self.backwardlinks, link):
-        #        if e in self.roots:
-        #            return e
-
-        page_count = {}
-        out_count = {}
+        count = {}
+        known_site = [urlparse(url).hostname for url in self.roots]
         for root in self.roots:
-            page_count.setdefault(urlparse(root).hostname, 0)
-            out_count.setdefault(urlparse(root).hostname, 0)
+            hostname = urlparse(root).hostname
+            count.setdefault(hostname, {'Pages':0, 'InterLinks':0, 'OutLinks':0})
+            for e in self.iter_dfs(self.forwardlinks, root):
+                for l in self.forwardlinks[e].keys():
+                    if urlparse(l).hostname in known_site:
+                        count[hostname]['InterLinks'] += 1
 
         for e in self.forwardlinks.keys():
-            #hostname = urlparse(root).hostname
-            #links = [e for e in self.iter_dfs(self.forwardlinks, root)]
-            #outlinks = [e for e in links if urlparse(e).hostname != hostname]
-            #count[hostname] = len(links)
-            #pprint.pprint(outlinks)
             try:
-                page_count[urlparse(e).hostname] += 1
+                count[urlparse(e).hostname]['Pages'] += 1
             except KeyError:
                 pass
 
         for k,v in self.outlinks.items():
             try:
-                out_count[urlparse(k).hostname] += len(v)
+                count[urlparse(k).hostname]['OutLinks'] += len(v)
             except KeyError:
                 pass
 
-        return page_count, out_count
+        return count
 
     def page_count_fromto(self):
         count = dict()
-
         for root in self.roots:
             count.setdefault(urlparse(root).hostname, dict())
 
@@ -145,7 +152,12 @@ class LinkMatrix():
         return count
 
     def site_count_fromto(self):
-        pass
+        count = dict()
+        for root in self.roots:
+            count.setdefault(urlparse(root).hostname, dict())
+
+        for e in self.forwardlinks.keys():
+            pass
 
 
 if __name__ == "__main__":
