@@ -68,11 +68,10 @@ class LinkMatrix():
     def export_matrix(self):
         pages_count = self.pages_and_links_count()
         with codecs.open("page and link counts.csv", "w", "cp936") as f:
-            fields = ["Site", "Pages", "InterLinks" "OutLinks"]
+            fields = ["Site", "Pages", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in pages_count.items():
-                print(v)
                 row = {fields[0]:k}
                 row.update(v)
                 print(row)
@@ -94,8 +93,9 @@ class LinkMatrix():
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k, v in page_fromto_count.items():
-                row = {"sites":k}
-                row.update(v)
+                row = {}
+                [row.setdefault(k2, v2) for k2,v2 in v.items() if k2 in fields]
+                row.update({"sites":k})
                 for e in page_fromto_count.keys():
                     row.setdefault(e, 0)
                 print(row)
