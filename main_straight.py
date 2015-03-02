@@ -251,7 +251,9 @@ class mycrawl(QtGui.QMainWindow):
     def on_exportaction_2_triggered(self):
         lm = LinkMatrix()
         lm.load()
-        matrix = lm.export_matrix()
+        #lm.export_matrix(self.projectnameLabel.text())
+        lm.export_matrix("im")
+        QtGui.QMessageBox.about(self, u"已保存", u"已保存")
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()

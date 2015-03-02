@@ -31,7 +31,11 @@ class SavePipeline(object): #下载所有item对应的网页
             self.getpath = self.getpath_3
 
         self.projectname = rs.projectname()
-        self.index = 0 #成功下载页面数
+
+        try:
+            os.mkdir(self.location)
+        except OSError as e:
+            if e.errno == 17: pass
 
     def getpath_1(self, **kwargs):
         return os.path.normcase(u"{0}/{1}.{2}".format(self.location, self.index, self.saveingformat))
@@ -49,9 +53,24 @@ class SavePipeline(object): #下载所有item对应的网页
             path = os.path.normcase(u"{0}/{1}.{2}".format(self.location, filename, self.saveingformat))
         return path
 
+    def open_spider(self, spider):
+        print("+SavePipeline opened spider")
+        self.index = 0 #成功下载页面数
+        self.page_count = dict()
+
+    def close_spider(self, spider):
+        with open("page index.csv", "w") as f:
+            fields = ["Index", "Url"]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k,v in self.page_count.items():
+                row = {"Index":k, "Url":v}
+                writer.writerow(row)
+
     def process_item(self, item, spider):
         try:
             self.index += 1
+            self.page_count.setdefault(self.index, item['url'])
 
             with open(self.getpath(title = item['title']), "w") as downpage:
                 downpage.write(item['body'])

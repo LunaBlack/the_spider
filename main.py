@@ -46,18 +46,18 @@ class mycrawl(QtGui.QMainWindow):
             self.resultplainTextEdit.appendPlainText('\n'.join(s))
 
         while self.state_conn[0].poll(): #查询是否接收到状态信息
-            a = self.state_conn.recv()
-            if a.endswith("downloader/request_count:"):
+            a = self.state_conn[0].recv()
+            if "downloader/request_count:" in a:
                 self.requestcountLabel.setText(a[64:].strip()) #改变请求页面数
-            elif a.endswith("downloader/response_count:"):
+            elif "downloader/response_count:" in a:
                 self.responsecountLabel.setText(a[65:].strip()) #改变响应页面数
-            elif a.endswith("downloader/response_bytes:"):
+            elif "downloader/response_bytes:" in a:
                 self.responsebytesLabel.setText(a[65:].strip()) #改变响应字节数
-            elif a.endswith("downloader/response_status_count/200:"):
+            elif "downloader/response_status_count/200:" in a:
                 self.response200countLabel.setText(a[76:].strip()) #改变成功响应页面数(200)
-            elif a.endswith("item_scraped_count:"):
+            elif "item_scraped_count:" in a:
                 self.itemscrapedLabel.setText(a[58:].strip()) #改变抓取条目数
-            elif a.endswith("downloaditem :"):
+            elif "downloaditem :" in a:
                 self.itemdownloadLabel.setText(a[27:].strip()) #改变成功下载条目数
 
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
@@ -66,6 +66,7 @@ class mycrawl(QtGui.QMainWindow):
                 stoped = True
                 self.spiderProcess.terminate()
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
+                self.statusLabel.setText(u"已完成") #改变运行状态Label
                 QtGui.QMessageBox.about(self, u"已完成", u"爬虫已完成")
 
         if stoped:
@@ -147,6 +148,7 @@ class mycrawl(QtGui.QMainWindow):
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
+
     def check_ready(self):
         if self.projectnameLabel.text() == u"（未创建）": #判断是否创建了项目
             QtGui.QMessageBox.about(self, u"未创建项目", u"请新建一个项目，点击文件菜单新建项目")
@@ -165,6 +167,7 @@ class mycrawl(QtGui.QMainWindow):
         else:
             return True
 
+
     def write_setting(self):
         with open("setting.txt", 'w') as f:
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
@@ -181,6 +184,7 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nlocation of saving: \n" + self.savelocationlineEdit.text().toUtf8())
             f.write("\n\nformat of saving: \n" + self.saveformatcomboBox.currentText())
             f.write("\n\nnaming of saving: \n" + self.namingcomboBox.currentText().toUtf8())
+
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
@@ -206,6 +210,8 @@ class mycrawl(QtGui.QMainWindow):
         self.spiderProcess.start()
 
         self.tabWidget.setCurrentIndex(1)
+        self.running = True
+        self.statusLabel.setText(u"正在运行") #改变运行状态Label
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
         #QtGui.QMessageBox.about(self, u"开始", u"开始爬取")
 
@@ -218,11 +224,15 @@ class mycrawl(QtGui.QMainWindow):
     def on_pauseButton_clicked(self):
 
         if self.running:
-            self.pauseButton.setText("continue")
-            self.ctrl_conn[0].send('unpause crawl')
-        else:
-            self.pauseButton.setText("pause")
+            self.running = not self.running
+            self.pauseButton.setText(u"恢复")
+            self.statusLabel.setText(u"暂停") #改变运行状态Label
             self.ctrl_conn[0].send('pause crawl')
+        else:
+            self.running = not self.running
+            self.pauseButton.setText(u"暂停")
+            self.statusLabel.setText(u"正在运行") #改变运行状态Label
+            self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
@@ -248,7 +258,8 @@ class mycrawl(QtGui.QMainWindow):
     def on_exportaction_2_triggered(self):
         lm = LinkMatrix()
         lm.load()
-        matrix = lm.export_matrix()
+        lm.export_matrix(self.projectnameLabel.text())
+        QtGui.QMessageBox.about(self, u"已保存", u"已保存")
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()

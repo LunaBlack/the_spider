@@ -6,6 +6,7 @@ from urlparse import urlparse
 import pprint
 import codecs
 import csv
+import os
 
 class LinkMatrix():
 
@@ -65,9 +66,15 @@ class LinkMatrix():
             #self.roots, self.forwardlinks, self.backwardlinks, self.outlinks = pickle.load(f)
             self.roots, self.forwardlinks, self.outlinks = pickle.load(f)
 
-    def export_matrix(self):
+    def export_matrix(self, projectname):
+        try:
+            os.mkdir(projectname)
+        except OSError as e:
+            if e.errno == 17:
+                pass
+
         pages_count = self.pages_and_links_count()
-        with codecs.open("page and link counts.csv", "w", "cp936") as f:
+        with codecs.open(projectname+"/page and link counts.csv", "w", "cp936") as f:
             fields = ["Site", "Pages", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -78,7 +85,7 @@ class LinkMatrix():
                 writer.writerow(row)
 
         page_fromto_count = self.page_count_fromto()
-        with codecs.open("page counts from-to1.csv", "w", "cp936") as f:
+        with codecs.open(projectname+"/page counts from-to1.csv", "w", "cp936") as f:
             fields = ["From", "To", "File Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -88,7 +95,7 @@ class LinkMatrix():
                     print(row)
                     writer.writerow(row)
 
-        with codecs.open("page counts from-to2.csv", "w", "cp936") as f:
+        with codecs.open(projectname+"/page counts from-to2.csv", "w", "cp936") as f:
             fields =["sites"] + [e for e in page_fromto_count.keys()]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -100,6 +107,18 @@ class LinkMatrix():
                     row.setdefault(e, 0)
                 print(row)
                 writer.writerow(row)
+
+        lines = []
+        for root in self.roots:
+            for e in self.iter_dfs(self.forwardlinks, root):
+                if len(self.forwardlinks[e]) > 1:
+                    lines.append(e+'\n')
+                    for r in self.forwardlinks[e].keys():
+                        lines.append("\t"+r+'\n')
+                    lines.append('\n')
+        with open(projectname+"/link_struct.txt", "w") as f:
+            f.writelines(lines)
+
 
     def iter_dfs(self, links, root):
         accessed, queue = set(), []
@@ -163,5 +182,5 @@ class LinkMatrix():
 if __name__ == "__main__":
     lm = LinkMatrix()
     lm.load()
-    lm.export_matrix()
+    lm.export_matrix("im")
 
