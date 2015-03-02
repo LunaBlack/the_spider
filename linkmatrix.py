@@ -10,7 +10,8 @@ import os
 
 class LinkMatrix():
 
-    def __init__(self):
+    def __init__(self, projectname):
+        self.projectname = projectname
         self.roots = []
         self.forwardlinks = dict()
         self.backwardlinks = dict()
@@ -22,6 +23,9 @@ class LinkMatrix():
             self.forwardlinks.setdefault(e, dict())
             self.backwardlinks.setdefault(e, None)
             self.outlinks.setdefault(e, set())
+
+    def setIndexMap(self, index):
+        self.indexmap = index
 
     def addLink(self, url, referer):
         try:
@@ -53,28 +57,52 @@ class LinkMatrix():
             return False
 
     def store(self):
-        #import ipdb;ipdb.set_trace()
-        with open("linkgraph", "w") as f:
+        try:
+            print("Store", self.projectname)
+            os.makedirs(self.projectname)
+        except OSError as err:
+            if err.errno != 17:
+                raise err
+
+        with open(self.projectname+"/page index.csv", "w") as f:
+            fields = ["Index", "Url"]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k,v in self.indexmap.items():
+                row = {"Index":v, "Url":k}
+                writer.writerow(row)
+
+        with open(self.projectname+"/linkgraph", "w") as f:
             #pickle.dump((self.roots, self.forwardlinks,
             #    self.backwardlinks, self.outlinks), f)
             pickle.dump((self.roots, self.forwardlinks,
                 self.outlinks), f)
+
         print("dumped")
 
     def load(self):
-        with open("linkgraph", "r") as f:
-            #self.roots, self.forwardlinks, self.backwardlinks, self.outlinks = pickle.load(f)
-            self.roots, self.forwardlinks, self.outlinks = pickle.load(f)
-
-    def export_matrix(self, projectname):
         try:
-            os.mkdir(projectname)
+            with open(self.projectname+"/linkgraph", "r") as f:
+                #self.roots, self.forwardlinks, self.backwardlinks, self.outlinks = pickle.load(f)
+                self.roots, self.forwardlinks, self.outlinks = pickle.load(f)
+
+            with open(self.projectname+"/page index.csv", "r") as f:
+                self.indexmap = {}
+                reader = csv.DictReader(f)
+                for e in reader:
+                    self.indexmap.update({e["Url"]:e["Index"]})
+        except IOError as err:
+            raise err
+
+    def export_matrix(self):
+        try:
+            os.mkdir(self.projectname)
         except OSError as e:
-            if e.errno == 17:
-                pass
+            if e.errno != 17:
+                raise
 
         pages_count = self.pages_and_links_count()
-        with codecs.open(projectname+"/page and link counts.csv", "w", "cp936") as f:
+        with open(self.projectname+"/page and link counts.csv", "w") as f:
             fields = ["Site", "Pages", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -84,41 +112,88 @@ class LinkMatrix():
                 print(row)
                 writer.writerow(row)
 
-        page_fromto_count = self.page_count_fromto()
-        with codecs.open(projectname+"/page counts from-to1.csv", "w", "cp936") as f:
-            fields = ["From", "To", "File Links"]
+        site_fromto_count = self.site_count_fromto()
+        with open(self.projectname+"/site counts from-to.csv", "w") as f:
+            fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in page_fromto_count.items():
+            for k,v in site_fromto_count.items():
                 for e,c in v.items():
                     row = {fields[0]:k, fields[1]:e, fields[2]:c}
                     print(row)
                     writer.writerow(row)
 
-        with codecs.open(projectname+"/page counts from-to2.csv", "w", "cp936") as f:
-            fields =["sites"] + [e for e in page_fromto_count.keys()]
+        with codecs.open(self.projectname+"/site matrix.csv", "w", "cp936") as f:
+            fields =["sites"] + [e for e in site_fromto_count.keys()]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k, v in page_fromto_count.items():
+            for k, v in site_fromto_count.items():
                 row = {}
                 [row.setdefault(k2, v2) for k2,v2 in v.items() if k2 in fields]
                 row.update({"sites":k})
-                for e in page_fromto_count.keys():
+                for e in site_fromto_count.keys():
                     row.setdefault(e, 0)
                 print(row)
                 writer.writerow(row)
 
-        lines = []
-        for root in self.roots:
-            for e in self.iter_dfs(self.forwardlinks, root):
-                if len(self.forwardlinks[e]) > 1:
-                    lines.append(e+'\n')
-                    for r in self.forwardlinks[e].keys():
-                        lines.append("\t"+r+'\n')
-                    lines.append('\n')
-        with open(projectname+"/link_struct.txt", "w") as f:
+        domain_fromto_count = self.domain_count_fromto()
+        with open(self.projectname+"/domain counts from-to.csv", "w") as f:
+            fields = ["From", "To", "Links"]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k,v in domain_fromto_count.items():
+                for e,c in v.items():
+                    row = {fields[0]:k, fields[1]:e, fields[2]:c}
+                    print(row)
+                    writer.writerow(row)
+
+        with codecs.open(self.projectname+"/domain matrix.csv", "w", "cp936") as f:
+            fields =["domains"] + [e for e in domain_fromto_count.keys()]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k, v in domain_fromto_count.items():
+                row = {}
+                [row.setdefault(k2, v2) for k2,v2 in v.items() if k2 in fields]
+                row.update({"domains":k})
+                for e in domain_fromto_count.keys():
+                    row.setdefault(e, 0)
+                print(row)
+                writer.writerow(row)
+
+        with open(self.projectname+"/link_struct.txt", "w") as f:
+            lines = []
+            for root in self.roots:
+                for e in self.iter_dfs(self.forwardlinks, root):
+                    if len(self.forwardlinks[e]) > 1:
+                        lines.append(e+'\n')
+                        for r in self.forwardlinks[e].keys():
+                            lines.append("\t"+r+'\n')
+                        lines.append('\n')
             f.writelines(lines)
 
+        with open(self.projectname+"/outlink_struct.txt", "w") as f:
+            lines = []
+            for root in self.roots:
+                for k,v in self.outlinks.items():
+                    if len(v) > 1:
+                        lines.append(k+'\n')
+                        for r in v:
+                            lines.append("\t"+r+'\n')
+                        lines.append('\n')
+            f.writelines(lines)
+
+        with open(self.projectname+"/page matrix.csv", "w") as f:
+            fields = ["from-to"] + [str(e) for e in range(1, len(self.indexmap)+1)]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            rows = []
+            for url,index in self.indexmap.items():
+                for e,n in self.forwardlinks[url].items():
+                    row = {"from-to":k}
+                    [row.setdefault(str(i), 0) for i in range(1, len(self.indexmap)+1)]
+                    row[self.indexmap[e]] = n
+                    rows.append(row)
+            writer.writerows(rows)
 
     def iter_dfs(self, links, root):
         accessed, queue = set(), []
@@ -156,7 +231,7 @@ class LinkMatrix():
 
         return count
 
-    def page_count_fromto(self):
+    def site_count_fromto(self):
         count = dict()
         for root in self.roots:
             count.setdefault(urlparse(root).hostname, dict())
@@ -170,17 +245,24 @@ class LinkMatrix():
 
         return count
 
-    def site_count_fromto(self):
+    def domain_count_fromto(self):
         count = dict()
         for root in self.roots:
-            count.setdefault(urlparse(root).hostname, dict())
+            domain = urlparse(root).hostname.split('.')[1]
+            count.setdefault(domain, dict())
 
         for e in self.forwardlinks.keys():
-            pass
+            from_domain = urlparse(e).hostname.split('.')[1]
+            for t in self.forwardlinks[e].keys():
+                to_domain = urlparse(t).hostname.split('.')[1]
+                count[from_domain].setdefault(to_domain, 0)
+                count[from_domain][to_domain] += 1
+
+        return count
 
 
 if __name__ == "__main__":
-    lm = LinkMatrix()
+    lm = LinkMatrix("wlv")
     lm.load()
-    lm.export_matrix("im")
+    lm.export_matrix()
 

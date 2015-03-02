@@ -59,18 +59,12 @@ class SavePipeline(object): #下载所有item对应的网页
         self.page_count = dict()
 
     def close_spider(self, spider):
-        with open("page index.csv", "w") as f:
-            fields = ["Index", "Url"]
-            writer = csv.DictWriter(f, fieldnames = fields)
-            writer.writeheader()
-            for k,v in self.page_count.items():
-                row = {"Index":k, "Url":v}
-                writer.writerow(row)
+        spider.linkmatrix.setIndexMap(self.page_count)
 
     def process_item(self, item, spider):
         try:
             self.index += 1
-            self.page_count.setdefault(self.index, item['url'])
+            self.page_count.setdefault(item['url'], self.index)
 
             with open(self.getpath(title = item['title']), "w") as downpage:
                 downpage.write(item['body'])

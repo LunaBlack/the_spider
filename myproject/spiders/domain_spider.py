@@ -17,7 +17,7 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
 
         rs = ReadSetting()
         self.start_urls = rs.readurl()
-        self.linkmatrix = LinkMatrix()
+        self.linkmatrix = LinkMatrix(rs.projectname())
         self.linkmatrix.setroot(self.start_urls)
 
         domains = rs.readdomain()

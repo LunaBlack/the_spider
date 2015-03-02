@@ -33,6 +33,12 @@ class mycrawl(QtGui.QMainWindow):
 
 
     def updateOutput(self): #将结果信息显示在界面
+        self.runningtime += self.running and 0.5 or 0
+        hour = int(self.runningtime)//3600
+        minute = int(self.runningtime - hour*3600) // 60
+        second = int(self.runningtime) % 60
+        self.runtimeLabel.setText("{0:02}:{1:02}:{2:02}".format(hour, minute, second))
+
         s = list()
         stoped = None
 
@@ -69,6 +75,7 @@ class mycrawl(QtGui.QMainWindow):
 
         if stoped:
             #self.timer.singleShot(500, self.updateOutput) #500毫秒执行一次
+            self.running = False
             self.timer.stop()
 
 
@@ -204,13 +211,14 @@ class mycrawl(QtGui.QMainWindow):
         self.spiderProcess.start()
 
         self.tabWidget.setCurrentIndex(1)
-        self.running = True
         self.statusLabel.setText(u"正在运行") #改变运行状态Label
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
 
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
             #self.timer.singleShot(500, self.updateOutput)
+            self.running = True
+            self.runningtime = 0
             self.timer.start(500)
 
 
@@ -227,9 +235,11 @@ class mycrawl(QtGui.QMainWindow):
             self.statusLabel.setText(u"正在运行") #改变运行状态Label
             self.ctrl_conn[0].send('unpause crawl')
 
+
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
         self.ctrl_conn[0].send('stop crawl')
+
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
@@ -247,13 +257,15 @@ class mycrawl(QtGui.QMainWindow):
         except AttributeError:
             pass
 
+
     @QtCore.pyqtSlot()
     def on_exportaction_2_triggered(self):
-        lm = LinkMatrix()
+        lm = LinkMatrix("wlv")
         lm.load()
         #lm.export_matrix(self.projectnameLabel.text())
-        lm.export_matrix("im")
+        lm.export_matrix()
         QtGui.QMessageBox.about(self, u"已保存", u"已保存")
+
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
@@ -261,6 +273,7 @@ def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spide
 
     the_spider = setupspider(rule, contrl_conn, result_conn, state_conn) #实例化setupspider类
     the_spider.run()
+
 
 if __name__ == "__main__":
     print("start")
