@@ -101,62 +101,52 @@ class LinkMatrix():
             if e.errno != 17:
                 raise
 
-        pages_count = self.pages_and_links_count()
-        with open(self.projectname+"/page and link counts.csv", "w") as f:
-            fields = ["Site", "Pages", "InterLinks", "OutLinks"]
+        site_count = self.site_links_count()
+        with open(self.projectname+"/site links counts.csv", "w") as f:
+            fields = ["Site", "Pages", "Knowlinks", "Unknowlinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in pages_count.items():
+            for k,v in site_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 print(row)
                 writer.writerow(row)
 
+        page_count = self.page_links_count()
+        with open(self.projectname+"/page links counts.csv", "w") as f:
+            fields = ["Page", "Knowlinks", "Unknowlinks", "InterLinks", "OutLinks"]
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            for k,v in page_count.items():
+                row = {fields[0]:k}
+                row.update(v)
+                print(row)
+                writer.writerow(row)
+
+
         site_fromto_count = self.site_count_fromto()
+        pprint.pprint(site_fromto_count)
         with open(self.projectname+"/site counts from-to.csv", "w") as f:
             fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in site_fromto_count.items():
                 for e,c in v.items():
-                    row = {fields[0]:k, fields[1]:e, fields[2]:c}
-                    print(row)
-                    writer.writerow(row)
+                    if urlparse(e).hostname in site_fromto_count:
+                        row = {fields[0]:k, fields[1]:e, fields[2]:c}
+                        print(row)
+                        writer.writerow(row)
 
-        with codecs.open(self.projectname+"/site matrix.csv", "w", "cp936") as f:
-            fields =["sites"] + [e for e in site_fromto_count.keys()]
+        with open(self.projectname+"/site matrix.csv", "w") as f:
+            fields =["sites"] + [urlparse(e).hostname for e in self.roots]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k, v in site_fromto_count.items():
-                row = {}
-                [row.setdefault(k2, v2) for k2,v2 in v.items() if k2 in fields]
-                row.update({"sites":k})
-                for e in site_fromto_count.keys():
-                    row.setdefault(e, 0)
-                print(row)
-                writer.writerow(row)
-
-        domain_fromto_count = self.domain_count_fromto()
-        with open(self.projectname+"/domain counts from-to.csv", "w") as f:
-            fields = ["From", "To", "Links"]
-            writer = csv.DictWriter(f, fieldnames = fields)
-            writer.writeheader()
-            for k,v in domain_fromto_count.items():
-                for e,c in v.items():
-                    row = {fields[0]:k, fields[1]:e, fields[2]:c}
-                    print(row)
-                    writer.writerow(row)
-
-        with codecs.open(self.projectname+"/domain matrix.csv", "w", "cp936") as f:
-            fields =["domains"] + [e for e in domain_fromto_count.keys()]
-            writer = csv.DictWriter(f, fieldnames = fields)
-            writer.writeheader()
-            for k, v in domain_fromto_count.items():
-                row = {}
-                [row.setdefault(k2, v2) for k2,v2 in v.items() if k2 in fields]
-                row.update({"domains":k})
-                for e in domain_fromto_count.keys():
-                    row.setdefault(e, 0)
+            for k in fields[1:]:
+                row = {"sites":k}
+                [row.setdefault(e, 0) for e in fields[1:]]
+                for e,c in site_fromto_count[k].items():
+                    if e in fields:
+                        row[e] = c
                 print(row)
                 writer.writerow(row)
 
@@ -183,15 +173,29 @@ class LinkMatrix():
             f.writelines(lines)
 
         with open(self.projectname+"/page matrix.csv", "w") as f:
-            fields = ["from-to"] + [str(e) for e in range(1, len(self.indexmap)+1)]
+            fields = ["from-to"] + self.forwardlinks.keys()
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             rows = []
-            for url,index in self.indexmap.items():
-                for e,n in self.forwardlinks[url].items():
+            for k,v in self.forwardlinks.items():
+                row = {"from-to":k}
+                [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
+                for e,n in v.items():
+                    row[e] = n
+                rows.append(row)
+            writer.writerows(rows)
+
+        with open(self.projectname+"/page matrix strip.csv", "w") as f:
+            fields = ["from-to"] + self.forwardlinks.keys()
+            writer = csv.DictWriter(f, fieldnames = fields)
+            writer.writeheader()
+            rows = []
+            for k,v in self.forwardlinks.items():
+                if len(v) >= 1:
                     row = {"from-to":k}
-                    [row.setdefault(str(i), 0) for i in range(1, len(self.indexmap)+1)]
-                    row[self.indexmap[e]] = n
+                    [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
+                    for e,n in v.items():
+                        row[e] = n
                     rows.append(row)
             writer.writerows(rows)
 
@@ -206,28 +210,63 @@ class LinkMatrix():
             queue.extend(links[u].keys())
             yield u
 
-    def pages_and_links_count(self):
+    def site_links_count(self):
         count = {}
         known_site = [urlparse(url).hostname for url in self.roots]
         for root in self.roots:
             hostname = urlparse(root).hostname
-            count.setdefault(hostname, {'Pages':0, 'InterLinks':0, 'OutLinks':0})
-            for e in self.iter_dfs(self.forwardlinks, root):
-                for l in self.forwardlinks[e].keys():
-                    if urlparse(l).hostname in known_site:
-                        count[hostname]['InterLinks'] += 1
+            count.setdefault(hostname, {'Pages':0, 'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
+            #for e in self.iter_dfs(self.forwardlinks, root):
+            #    for l in self.forwardlinks[e].keys():
+            #        if urlparse(l).hostname in known_site:
+            #            count[hostname]['InterLinks'] += 1
 
-        for e in self.forwardlinks.keys():
+        for k,v in self.forwardlinks.items():
             try:
-                count[urlparse(e).hostname]['Pages'] += 1
-            except KeyError:
-                pass
+                from_host = urlparse(k).hostname
+                count[from_host]['Pages'] += 1
+                for t in v.keys():
+                    to_host = urlparse(t).hostname
+                    if to_host == from_host:
+                        count[from_host]['InterLinks'] += 1
+                    else:
+                        count[from_host]['OutLinks'] += 1
+                    if to_host in known_site:
+                        count[from_host]['Knowlinks'] += 1
+                    else:
+                        count[from_host]['Unknowlinks'] += 1
+            except KeyError as err:
+                print(err)
 
         for k,v in self.outlinks.items():
             try:
                 count[urlparse(k).hostname]['OutLinks'] += len(v)
-            except KeyError:
-                pass
+                count[urlparse(k).hostname]['Unknowlinks'] += len(v)
+            except KeyError as err:
+                print(err)
+
+        return count
+
+    def page_links_count(self):
+        count = {}
+        known_site = [urlparse(url).hostname for url in self.roots]
+        for k,v in self.forwardlinks.items():
+            from_host = urlparse(k).hostname
+            count.setdefault(k, {'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
+            for t in v.keys():
+                to_host = urlparse(t).hostname
+                if to_host == from_host:
+                    count[k]['InterLinks'] += 1
+                else:
+                    count[k]['OutLinks'] += 1
+                if to_host in known_site:
+                    count[k]['Knowlinks'] += 1
+                else:
+                    count[k]['Unknowlinks'] += 1
+
+        for k,v in self.outlinks.items():
+            count[k]['OutLinks'] += len(v)
+            count[k]['Unknowlinks'] += len(v)
 
         return count
 

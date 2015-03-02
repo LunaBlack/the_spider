@@ -31,7 +31,6 @@ class mycrawl(QtGui.QMainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.updateOutput)
 
-
     def updateOutput(self): #将结果信息显示在界面
         self.runningtime += self.running and 0.5 or 0
         hour = int(self.runningtime)//3600
@@ -78,7 +77,6 @@ class mycrawl(QtGui.QMainWindow):
             self.running = False
             self.timer.stop()
 
-
     @QtCore.pyqtSlot()
     def on_newprojectaction_triggered(self): #新建一个scrapy项目
         self.logger.info("start new project")
@@ -92,7 +90,6 @@ class mycrawl(QtGui.QMainWindow):
             self.projectnameLabel.setText(self.name)
         else:
             self.logger.info("new project is not started")
-
 
     @QtCore.pyqtSlot()
     def on_addurlButton_clicked(self): #添加起始url
@@ -114,12 +111,10 @@ class mycrawl(QtGui.QMainWindow):
 
         self.logger.info("add url ending")
 
-
     @QtCore.pyqtSlot()
     def on_emptyurlButton_clicked(self): #清空起始url
         self.urltextBrowser.setText("")
         self.logger.info("empty the url")
-
 
     @QtCore.pyqtSlot()
     def on_savelocationpushButton_clicked(self): #选择文件保存的位置
@@ -127,14 +122,12 @@ class mycrawl(QtGui.QMainWindow):
         s = unicode(path.toUtf8(), "utf8")
         self.savelocationlineEdit.setText(s)
 
-
     @QtCore.pyqtSlot()
     def on_autoacquireradioButton_clicked(self): #选择url获取规则为“从页面自动分析获取”
         self.logger.info("choose autospider")
         self.ruleplainTextEdit.setPlainText(u"不需要填写本编辑框")
         self.ruletextlabel.setText(u"不需要填写")
         self.rule = "auto"
-
 
     @QtCore.pyqtSlot()
     def on_matchradioButton_clicked(self): #选择url获取规则为“域名匹配及路径选择”
@@ -144,7 +137,6 @@ class mycrawl(QtGui.QMainWindow):
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,三项均\n非必选项,\n一行一项")
         self.rule = "domain"
 
-
     @QtCore.pyqtSlot()
     def on_xpathradioButton_clicked(self): #选择url获取规则为“Xpath表达式”
         self.logger.info("choose xpathspider")
@@ -152,7 +144,6 @@ class mycrawl(QtGui.QMainWindow):
             "allowed_domains=('example.com')\nurl='//ul/li//div[2]/h2/a/@href'")
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
         self.rule = "xpath"
-
 
     def check_ready(self):
         if self.projectnameLabel.text() == u"（未创建）": #判断是否创建了项目
@@ -172,7 +163,6 @@ class mycrawl(QtGui.QMainWindow):
         else:
             return True
 
-
     def write_setting(self):
         with open("setting.txt", 'w') as f:
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
@@ -189,7 +179,6 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nlocation of saving: \n" + self.savelocationlineEdit.text().toUtf8())
             f.write("\n\nformat of saving: \n" + self.saveformatcomboBox.currentText())
             f.write("\n\nnaming of saving: \n" + self.namingcomboBox.currentText().toUtf8())
-
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
@@ -213,6 +202,7 @@ class mycrawl(QtGui.QMainWindow):
         self.tabWidget.setCurrentIndex(1)
         self.statusLabel.setText(u"正在运行") #改变运行状态Label
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
+        #QtGui.QMessageBox.about(self, u"开始", u"开始爬取")
 
         self.main_conn[0].send(self.rule)
         if self.main_conn[0].recv() == "start crawl":
@@ -220,7 +210,6 @@ class mycrawl(QtGui.QMainWindow):
             self.running = True
             self.runningtime = 0
             self.timer.start(500)
-
 
     @QtCore.pyqtSlot()
     def on_pauseButton_clicked(self):
@@ -235,11 +224,9 @@ class mycrawl(QtGui.QMainWindow):
             self.statusLabel.setText(u"正在运行") #改变运行状态Label
             self.ctrl_conn[0].send('unpause crawl')
 
-
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self):
         self.ctrl_conn[0].send('stop crawl')
-
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
@@ -257,6 +244,16 @@ class mycrawl(QtGui.QMainWindow):
         except AttributeError:
             pass
 
+    def write_final_stats(self):
+        with open(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')+'/final stats.txt', 'w') as f:
+            lines = []
+            lines.append("downloader/request_count: {0}\n".format(self.requestcountLabel.text()) )
+            lines.append("downloader/response_count: {0}\n".format(self.responsecountLabel.text()) )
+            lines.append("downloader/response_bytes: {0}\n".format(self.responsebytesLabel.text()) )
+            lines.append("downloader/response_status_count/200: {0}\n".format(self.response200countLabel.text()) )
+            lines.append("item_scraped_count: {0}\n".format(self.itemscrapedLabel.text()) )
+            lines.append("downloaditem : {0}\n".format(self.itemdownloadLabel.text()) )
+            f.writelines(lines)
 
     @QtCore.pyqtSlot()
     def on_exportaction_2_triggered(self):
@@ -264,8 +261,8 @@ class mycrawl(QtGui.QMainWindow):
         lm.load()
         #lm.export_matrix(self.projectnameLabel.text())
         lm.export_matrix()
+        self.write_final_stats()
         QtGui.QMessageBox.about(self, u"已保存", u"已保存")
-
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
@@ -273,7 +270,6 @@ def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spide
 
     the_spider = setupspider(rule, contrl_conn, result_conn, state_conn) #实例化setupspider类
     the_spider.run()
-
 
 if __name__ == "__main__":
     print("start")
