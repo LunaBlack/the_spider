@@ -73,6 +73,8 @@ class SavePipeline(object): #下载所有item对应的网页
             GlobalLogging.getInstance().info("[stats] downloaditem : {0}".format(self.index))
         except KeyError:
             GlobalLogging.getInstance().error(u"[fail] download\n         url: {0}".format(item['url']))
+        except IOError as e:
+            GlobalLogging.getInstance().error(u"[fail] download, {1}: {2}\n         url: {1}".format(item['url'], e.strerror, e.filename))
 
         return item
 
