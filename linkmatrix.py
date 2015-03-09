@@ -109,7 +109,7 @@ class LinkMatrix():
             for k,v in site_count.items():
                 row = {fields[0]:k}
                 row.update(v)
-                print(row)
+                #print(row)
                 writer.writerow(row)
 
         page_count = self.page_links_count()
@@ -120,12 +120,12 @@ class LinkMatrix():
             for k,v in page_count.items():
                 row = {fields[0]:k}
                 row.update(v)
-                print(row)
+                #print(row)
                 writer.writerow(row)
 
 
         site_fromto_count = self.site_count_fromto()
-        pprint.pprint(site_fromto_count)
+        #pprint.pprint(site_fromto_count)
         with open(self.projectname+"/site counts from-to.csv", "w") as f:
             fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
@@ -134,7 +134,7 @@ class LinkMatrix():
                 for e,c in v.items():
                     if urlparse(e).hostname in site_fromto_count:
                         row = {fields[0]:k, fields[1]:e, fields[2]:c}
-                        print(row)
+                        #print(row)
                         writer.writerow(row)
 
         with open(self.projectname+"/site matrix.csv", "w") as f:
@@ -147,7 +147,7 @@ class LinkMatrix():
                 for e,c in site_fromto_count[k].items():
                     if e in fields:
                         row[e] = c
-                print(row)
+                #print(row)
                 writer.writerow(row)
 
         with open(self.projectname+"/link_struct.txt", "w") as f:

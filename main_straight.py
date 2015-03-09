@@ -51,17 +51,23 @@ class mycrawl(QtGui.QMainWindow):
         while self.state_conn[0].poll(): #查询是否接收到状态信息
             a = self.state_conn[0].recv()
             if "downloader/request_count:" in a:
-                self.requestcountLabel.setText(a[64:].strip()) #改变请求页面数
+                self.request_count = a[64:].strip()
+                self.requestcountLabel.setText(self.request_count) #改变请求页面数
             elif "downloader/response_count:" in a:
-                self.responsecountLabel.setText(a[65:].strip()) #改变响应页面数
+                self.response_count = a[65:].strip()
+                self.responsecountLabel.setText(self.response_count) #改变响应页面数
             elif "downloader/response_bytes:" in a:
-                self.responsebytesLabel.setText(a[65:].strip()) #改变响应字节数
+                self.response_bytes = a[65:].strip()
+                self.responsebytesLabel.setText(self.response_bytes) #改变响应字节数
             elif "downloader/response_status_count/200:" in a:
-                self.response200countLabel.setText(a[76:].strip()) #改变成功响应页面数(200)
+                self.response_200_count = a[76:].strip()
+                self.response200countLabel.setText(self.response_200_count) #改变成功响应页面数(200)
             elif "item_scraped_count:" in a:
-                self.itemscrapedLabel.setText(a[58:].strip()) #改变抓取条目数
+                self.item_scraped_count = a[58:].strip()
+                self.itemscrapedLabel.setText(self.item_scraped_count) #改变抓取条目数
             elif "downloaditem :" in a:
-                self.itemdownloadLabel.setText(a[27:].strip()) #改变成功下载条目数
+                self.downloaditem_count = a[27:].strip()
+                self.itemdownloadLabel.setText(self.downloaditem_count) #改变成功下载条目数
 
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
             c = self.ctrl_conn[0].recv()
@@ -245,14 +251,14 @@ class mycrawl(QtGui.QMainWindow):
             pass
 
     def write_final_stats(self):
-        with open(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')+'/final stats.txt', 'w') as f:
+        with open(unicode("wlv", 'utf8')+'/final stats.txt', 'w') as f:
             lines = []
-            lines.append("downloader/request_count: {0}\n".format(self.requestcountLabel.text()) )
-            lines.append("downloader/response_count: {0}\n".format(self.responsecountLabel.text()) )
-            lines.append("downloader/response_bytes: {0}\n".format(self.responsebytesLabel.text()) )
-            lines.append("downloader/response_status_count/200: {0}\n".format(self.response200countLabel.text()) )
-            lines.append("item_scraped_count: {0}\n".format(self.itemscrapedLabel.text()) )
-            lines.append("downloaditem : {0}\n".format(self.itemdownloadLabel.text()) )
+            lines.append("downloader/request_count: {0}\n".format(self.request_count) )
+            lines.append("downloader/response_count: {0}\n".format(self.response_count) )
+            lines.append("downloader/response_bytes: {0}\n".format(self.response_bytes) )
+            lines.append("downloader/response_status_count/200: {0}\n".format(self.response_200_count) )
+            lines.append("item_scraped_count: {0}\n".format(self.item_scraped_count) )
+            lines.append("downloaditem : {0}\n".format(self.downloaditem_count) )
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
