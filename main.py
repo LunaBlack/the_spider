@@ -30,6 +30,12 @@ class mycrawl(QtGui.QMainWindow):
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.updateOutput)
+        self.request_count = ''
+        self.response_count = ''
+        self.response_bytes = ''
+        self.response_200_count = ''
+        self.item_scraped_count = ''
+        self.downloaditem_count = ''
 
     def updateOutput(self): #将结果信息显示在界面
         self.runningtime += self.running and 0.5 or 0
@@ -52,7 +58,7 @@ class mycrawl(QtGui.QMainWindow):
             a = self.state_conn[0].recv()
             if "downloader/request_count:" in a:
                 self.request_count = a[64:].strip()
-                self.requestcountLabel.setText(a[64:].strip()) #改变请求页面数
+                self.requestcountLabel.setText(self.request_count) #改变请求页面数
             elif "downloader/response_count:" in a:
                 self.response_count = a[65:].strip()
                 self.responsecountLabel.setText(self.response_count) #改变响应页面数

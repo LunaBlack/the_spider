@@ -30,6 +30,12 @@ class mycrawl(QtGui.QMainWindow):
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.updateOutput)
+        self.request_count = ''
+        self.response_count = ''
+        self.response_bytes = ''
+        self.response_200_count = ''
+        self.item_scraped_count = ''
+        self.downloaditem_count = ''
 
     def updateOutput(self): #将结果信息显示在界面
         self.runningtime += self.running and 0.5 or 0
