@@ -132,10 +132,9 @@ class LinkMatrix():
             writer.writeheader()
             for k,v in site_fromto_count.items():
                 for e,c in v.items():
-                    if urlparse(e).hostname in site_fromto_count:
-                        row = {fields[0]:k, fields[1]:e, fields[2]:c}
-                        #print(row)
-                        writer.writerow(row)
+                    row = {fields[0]:k, fields[1]:e, fields[2]:c}
+                    #print(row)
+                    writer.writerow(row)
 
         with open(self.projectname+"/site matrix.csv", "w") as f:
             fields =["sites"] + [urlparse(e).hostname for e in self.roots]
@@ -152,24 +151,34 @@ class LinkMatrix():
 
         with open(self.projectname+"/link_struct.txt", "w") as f:
             lines = []
-            for root in self.roots:
-                for e in self.iter_dfs(self.forwardlinks, root):
-                    if len(self.forwardlinks[e]) > 1:
-                        lines.append(e+'\n')
-                        for r in self.forwardlinks[e].keys():
-                            lines.append("\t"+r+'\n')
-                        lines.append('\n')
+            for k,v in self.forwardlinks.items():
+                if len(v) > 1 or len(self.outlinks[k]) > 1:
+                    lines.append(k+'\n')
+                    for r in v.keys():
+                        lines.append("\t"+r+'\n')
+                    for r in self.outlinks[k]:
+                        lines.append("\t"+r+'\n')
+                    lines.append('\n')
+            f.writelines(lines)
+
+        with open(self.projectname+"/inlink_struct.txt", "w") as f:
+            lines = []
+            for k,v in self.forwardlinks.items():
+                if len(v) > 1:
+                    lines.append(e+'\n')
+                    for r in v.keys():
+                        lines.append("\t"+r+'\n')
+                    lines.append('\n')
             f.writelines(lines)
 
         with open(self.projectname+"/outlink_struct.txt", "w") as f:
             lines = []
-            for root in self.roots:
-                for k,v in self.outlinks.items():
-                    if len(v) > 1:
-                        lines.append(k+'\n')
-                        for r in v:
-                            lines.append("\t"+r+'\n')
-                        lines.append('\n')
+            for k,v in self.outlinks.items():
+                if len(v) > 1:
+                    lines.append(k+'\n')
+                    for r in v:
+                        lines.append("\t"+r+'\n')
+                    lines.append('\n')
             f.writelines(lines)
 
         with open(self.projectname+"/page matrix.csv", "w") as f:

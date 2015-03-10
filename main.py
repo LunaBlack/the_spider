@@ -157,7 +157,7 @@ class mycrawl(QtGui.QMainWindow):
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
-    def check_ready(self):
+    def check_ready(self): #检查是否所有参数都已设置好
         if self.projectnameLabel.text() == u"（未创建）": #判断是否创建了项目
             QtGui.QMessageBox.about(self, u"未创建项目", u"请新建一个项目，点击文件菜单新建项目")
             return False
@@ -175,7 +175,7 @@ class mycrawl(QtGui.QMainWindow):
         else:
             return True
 
-    def write_setting(self):
+    def write_setting(self): #将参数写入setting文本
         with open("setting.txt", 'w') as f:
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
             f.write("\n\ninitial url: \n" + self.urltextBrowser.toPlainText())
@@ -228,7 +228,7 @@ class mycrawl(QtGui.QMainWindow):
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
-    def on_pauseButton_clicked(self):
+    def on_pauseButton_clicked(self): #暂停或者继续
         if self.running:
             self.running = not self.running
             self.pauseButton.setText(u"恢复")
@@ -241,7 +241,7 @@ class mycrawl(QtGui.QMainWindow):
             self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
-    def on_stopButton_clicked(self):
+    def on_stopButton_clicked(self): #停止爬取
         self.ctrl_conn[0].send('stop crawl')
 
     @QtCore.pyqtSlot()
@@ -260,7 +260,7 @@ class mycrawl(QtGui.QMainWindow):
         except AttributeError:
             pass
 
-    def write_final_stats(self):
+    def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
         with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
             lines = []
             lines.append("downloader/request_count: {0}\n".format(self.request_count) )
@@ -272,13 +272,13 @@ class mycrawl(QtGui.QMainWindow):
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
-    def on_exportaction_2_triggered(self):
+    def on_buildoutputaction_triggered(self): #生成统计矩阵
         lm = LinkMatrix(self.projectnameLabel.text())
         lm.load()
         #lm.export_matrix(self.projectnameLabel.text())
         lm.export_matrix()
         self.write_final_stats()
-        QtGui.QMessageBox.about(self, u"已保存", u"已保存")
+        QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()

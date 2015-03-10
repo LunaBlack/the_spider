@@ -268,7 +268,7 @@ class mycrawl(QtGui.QMainWindow):
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
-    def on_exportaction_2_triggered(self):
+    def on_buildoutputaction_triggered(self):
         lm = LinkMatrix("wlv")
         lm.load()
         #lm.export_matrix(self.projectnameLabel.text())
