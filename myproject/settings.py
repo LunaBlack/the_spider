@@ -40,24 +40,23 @@ COOKIES_ENABLED = False #禁止cookies
 
 AJAXCRAWL_ENABLED = True #启用“Ajax Crawlable Pages”爬取
 
+REDIRECT_ENABLED = True
+
 STATS_CLASS = 'statscollect.SpiderStatsCollector' #设置状态收集器
 
-
-if rs.savingname() == 1:
-    ITEM_PIPELINES = {'myproject.pipelines.DuplicatePipeline': 300, \
-                  'myproject.pipelines.CsvWriterPipeline': 400, \
-                  'myproject.pipelines.FirstDownloadPipeline': 500, }
-elif rs.savingname() == 2:
-    ITEM_PIPELINES = {
-            'myproject.pipelines.StatisticsPipeline': 300,
-            'myproject.pipelines.CsvWriterPipeline': 400,
-            'myproject.pipelines.SecondDownloadPipeline': 500, }
-elif rs.savingname() == 3:
-    ITEM_PIPELINES = {'myproject.pipelines.DuplicatePipeline': 300, \
-                  'myproject.pipelines.CsvWriterPipeline': 400, \
-                  'myproject.pipelines.ThirdDownloadPipeline': 500, }
+#JOBDIR = 'crawls/{0}'.format(BOT_NAME)
 
 
+ITEM_PIPELINES = {
+        'myproject.pipelines.StatisticsPipeline': 300,
+        'myproject.pipelines.SavePipeline': 500,
+        }
+
+SPIDER_MIDDLEWARES = {
+        'myproject.spidermiddlewares.OffsiteMiddleware': 543,
+        'scrapy.contrib.spidermiddleware.offsite.OffsiteMiddleware': None,
+        }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'myproject (+http://www.yourdomain.com)'
+

@@ -36,7 +36,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
 
 
     def readdomain(self): #读取指定的域名或路径
-        domain = allow = deny = ""
+        domain = allow = deny = None
 
         for n,i in enumerate(self.text):
             if i.startswith("domain:"):
@@ -51,18 +51,26 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                     m = m + 1
                 break
 
-        if type(domain) == str:
-            domain = [domain, ]
-        else:
-            domain = list(set(domain))
-        if type(allow) == str:
+        if isinstance(domain, str):
+            domain = (domain, )
+        elif isinstance(domain, tuple):
+            domain = tuple(set(domain))
+        elif domain is None:
+            domain = tuple()
+
+        if isinstance(allow, str):
             allow = (allow, )
-        else:
+        elif isinstance(allow, tuple):
             allow = tuple(set(allow))
-        if type(deny) == str:
+        elif allow is None:
+            allow = tuple()
+
+        if isinstance(deny, str):
             deny = (deny, )
-        else:
+        elif isinstance(deny, tuple):
             deny = tuple(set(deny))
+        elif deny is None:
+            deny = tuple()
 
         return (domain, allow, deny)
 
@@ -134,7 +142,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         for n,i in enumerate(self.text):
             if i.startswith("location of saving:"):
                 m = n + 1
-                savinglocation = self.text[m].strip()
+                savinglocation = unicode(self.text[m].strip(), 'utf8')
                 break
         return savinglocation
 
