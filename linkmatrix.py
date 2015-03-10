@@ -64,7 +64,7 @@ class LinkMatrix():
             if err.errno != 17:
                 raise err
 
-        with open(self.projectname+"/page index.csv", "w") as f:
+        with open(self.projectname+"/page index.csv", "wb") as f:
             fields = ["Index", "Url"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -72,7 +72,7 @@ class LinkMatrix():
                 row = {"Index":v, "Url":k}
                 writer.writerow(row)
 
-        with open(self.projectname+"/linkgraph", "w") as f:
+        with open(self.projectname+"/linkgraph", "wb") as f:
             #pickle.dump((self.roots, self.forwardlinks,
             #    self.backwardlinks, self.outlinks), f)
             pickle.dump((self.roots, self.forwardlinks,
@@ -149,7 +149,7 @@ class LinkMatrix():
                 #print(row)
                 writer.writerow(row)
 
-        with open(self.projectname+"/link_struct.txt", "wb") as f:
+        with open(self.projectname+"/link_struct.txt", "w") as f:
             lines = []
             for k,v in self.forwardlinks.items():
                 if len(v) > 1 or len(self.outlinks[k]) > 1:
@@ -161,7 +161,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        with open(self.projectname+"/inlink_struct.txt", "wb") as f:
+        with open(self.projectname+"/inlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.forwardlinks.items():
                 if len(v) > 1:
