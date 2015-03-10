@@ -102,7 +102,7 @@ class LinkMatrix():
                 raise
 
         site_count = self.site_links_count()
-        with open(self.projectname+"/site links counts.csv", "w") as f:
+        with open(self.projectname+"/site links counts.csv", "wb") as f:
             fields = ["Site", "Pages", "Knowlinks", "Unknowlinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -113,7 +113,7 @@ class LinkMatrix():
                 writer.writerow(row)
 
         page_count = self.page_links_count()
-        with open(self.projectname+"/page links counts.csv", "w") as f:
+        with open(self.projectname+"/page links counts.csv", "wb") as f:
             fields = ["Page", "Knowlinks", "Unknowlinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -126,7 +126,7 @@ class LinkMatrix():
 
         site_fromto_count = self.site_count_fromto()
         #pprint.pprint(site_fromto_count)
-        with open(self.projectname+"/site counts from-to.csv", "w") as f:
+        with open(self.projectname+"/site counts from-to.csv", "wb") as f:
             fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -136,7 +136,7 @@ class LinkMatrix():
                     #print(row)
                     writer.writerow(row)
 
-        with open(self.projectname+"/site matrix.csv", "w") as f:
+        with open(self.projectname+"/site matrix.csv", "wb") as f:
             fields =["sites"] + [urlparse(e).hostname for e in self.roots]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -149,7 +149,7 @@ class LinkMatrix():
                 #print(row)
                 writer.writerow(row)
 
-        with open(self.projectname+"/link_struct.txt", "w") as f:
+        with open(self.projectname+"/link_struct.txt", "wb") as f:
             lines = []
             for k,v in self.forwardlinks.items():
                 if len(v) > 1 or len(self.outlinks[k]) > 1:
@@ -161,7 +161,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        with open(self.projectname+"/inlink_struct.txt", "w") as f:
+        with open(self.projectname+"/inlink_struct.txt", "wb") as f:
             lines = []
             for k,v in self.forwardlinks.items():
                 if len(v) > 1:
@@ -171,7 +171,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        with open(self.projectname+"/outlink_struct.txt", "w") as f:
+        with open(self.projectname+"/outlink_struct.txt", "wb") as f:
             lines = []
             for k,v in self.outlinks.items():
                 if len(v) > 1:
@@ -181,7 +181,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        with open(self.projectname+"/page matrix.csv", "w") as f:
+        with open(self.projectname+"/page matrix.csv", "wb") as f:
             fields = ["from-to"] + self.forwardlinks.keys()
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
@@ -194,7 +194,7 @@ class LinkMatrix():
                 rows.append(row)
             writer.writerows(rows)
 
-        with open(self.projectname+"/page matrix strip.csv", "w") as f:
+        with open(self.projectname+"/page matrix strip.csv", "wb") as f:
             fields = ["from-to"] + self.forwardlinks.keys()
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
