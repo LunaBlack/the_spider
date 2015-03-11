@@ -197,7 +197,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        self.rule = "domain"
+        self.rule = "xpath"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
 
@@ -311,16 +311,14 @@ class mycrawl(QtGui.QMainWindow):
             QtGui.QMessageBox.about(self, u"文件不存在", u"文件不存在")
 
     def opentxtfile(self, f_path): #打开txt格式文件
-            if os.path.exists(f_path):
-                try:
-                    if platform.system() == 'Windows':
-                        win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
-                    else:
-                        os.system('xdg-open {0}'.format(f_path))
-                except:
-                    QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
-            else:
-                QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
+        if os.path.exists(f_path):
+            try:
+                if platform.system() == 'Windows':
+                    win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
+                else:
+                    os.system('xdg-open {0}'.format(f_path))
+            except:
+                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
         else:
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
 
