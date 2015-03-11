@@ -24,10 +24,15 @@ class LinkMatrix():
             self.backwardlinks.setdefault(e, None)
             self.outlinks.setdefault(e, set())
 
+        self.known_site = [urlparse(url).hostname for url in self.roots]
+
     def setIndexMap(self, index):
         self.indexmap = index
 
     def addLink(self, url, referer):
+        if urlparse(url).hostname not in self.known_site:
+            return True #not download
+
         try:
             if self.forwardlinks[referer].setdefault(url, 0):
                 self.forwardlinks[referer][url] += 1
@@ -221,7 +226,7 @@ class LinkMatrix():
 
     def site_links_count(self):
         count = {}
-        known_site = [urlparse(url).hostname for url in self.roots]
+        #known_site = [urlparse(url).hostname for url in self.roots]
         for root in self.roots:
             hostname = urlparse(root).hostname
             count.setdefault(hostname, {'Pages':0, 'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
@@ -240,10 +245,7 @@ class LinkMatrix():
                         count[from_host]['InterLinks'] += 1
                     else:
                         count[from_host]['OutLinks'] += 1
-                    if to_host in known_site:
-                        count[from_host]['Knowlinks'] += 1
-                    else:
-                        count[from_host]['Unknowlinks'] += 1
+                    count[from_host]['Knowlinks'] += 1
             except KeyError as err:
                 print(err)
 
@@ -258,7 +260,6 @@ class LinkMatrix():
 
     def page_links_count(self):
         count = {}
-        known_site = [urlparse(url).hostname for url in self.roots]
         for k,v in self.forwardlinks.items():
             from_host = urlparse(k).hostname
             count.setdefault(k, {'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
@@ -268,10 +269,7 @@ class LinkMatrix():
                     count[k]['InterLinks'] += 1
                 else:
                     count[k]['OutLinks'] += 1
-                if to_host in known_site:
-                    count[k]['Knowlinks'] += 1
-                else:
-                    count[k]['Unknowlinks'] += 1
+                count[k]['Knowlinks'] += 1
 
         for k,v in self.outlinks.items():
             count[k]['OutLinks'] += len(v)
