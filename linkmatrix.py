@@ -171,7 +171,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        with open(self.projectname+"/outlink_struct.txt", "wb") as f:
+        with open(self.projectname+"/outlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.outlinks.items():
                 if len(v) > 1:

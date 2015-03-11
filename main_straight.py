@@ -1,9 +1,10 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, os
 import time, logging
 from multiprocessing import Process, Pipe
+import win32com.client, win32api
 
 from PyQt4 import QtCore, QtGui, uic
 from addurl import addurl
@@ -266,6 +267,22 @@ class mycrawl(QtGui.QMainWindow):
             lines.append("item_scraped_count: {0}\n".format(self.item_scraped_count) )
             lines.append("downloaditem : {0}\n".format(self.downloaditem_count) )
             f.writelines(lines)
+
+    @QtCore.pyqtSlot()
+    def on_startprojectaction_triggered(self): #通过菜单开始爬取
+        self.on_startButton_clicked()
+
+    @QtCore.pyqtSlot()
+    def on_pauseprojectaction_triggered(self): #通过菜单暂停爬取
+        self.on_pauseButton_clicked()
+
+    @QtCore.pyqtSlot()
+    def on_stopprojectaction_triggered(self): #通过菜单停止爬取
+        self.on_stopButton_clicked()
+
+    @QtCore.pyqtSlot()
+    def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
+        self.closeEvent(event)
 
     @QtCore.pyqtSlot()
     def on_buildoutputaction_triggered(self):
