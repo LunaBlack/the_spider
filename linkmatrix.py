@@ -208,7 +208,7 @@ class LinkMatrix():
                     rows.append(row)
             writer.writerows(rows)
 
-    def iter_dfs(self, links, root):
+    def iter_dfs(self, links, root): #深度优先遍历,生成链接链(暂时无用)
         accessed, queue = set(), []
         queue.append(root)
         while queue:
@@ -293,7 +293,7 @@ class LinkMatrix():
 
         return count
 
-    def domain_count_fromto(self):
+    def domain_count_fromto(self): #(暂时无用)
         count = dict()
         for root in self.roots:
             domain = urlparse(root).hostname.split('.')[1]

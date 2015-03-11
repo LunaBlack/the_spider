@@ -949,6 +949,7 @@ Xpath表达式</string>
      <string>文件</string>
     </property>
     <addaction name="newprojectaction"/>
+    <addaction name="action"/>
     <addaction name="pauseactionaction"/>
     <addaction name="stopprojectaction"/>
     <addaction name="separator"/>
@@ -985,7 +986,7 @@ Xpath表达式</string>
   </action>
   <action name="pauseactionaction">
    <property name="text">
-    <string>暂停项目</string>
+    <string>暂停/继续项目</string>
    </property>
   </action>
   <action name="stopprojectaction">
@@ -1046,6 +1047,11 @@ Xpath表达式</string>
   <action name="exportresultaction">
    <property name="text">
     <string>导出运行结果</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>开始项目</string>
    </property>
   </action>
  </widget>
