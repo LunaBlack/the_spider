@@ -1,19 +1,17 @@
-
+﻿
 
 project name: 
-wlv
+123
 
 initial url: 
-http://cybermetrics.wlv.ac.uk
-http://linkanalysis.wlv.ac.uk
-http://socscibot.wlv.ac.uk
+http://im.nju.edu.cn
 
 rule: 
-domain
+xpath
 
-domain: 
-allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
-
+xpath: 
+allowed_domains=('im.nju.edu.cn')
+url='//ul/li//a/@href'
 
 largest number of pages: 
 1000
