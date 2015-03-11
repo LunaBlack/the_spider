@@ -1,9 +1,10 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-import sys
+import sys, os
 import time, logging
 from multiprocessing import Process, Pipe
+import win32com.client, win32api
 
 from PyQt4 import QtCore, QtGui, uic
 from addurl import addurl
@@ -228,6 +229,10 @@ class mycrawl(QtGui.QMainWindow):
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
+    def on_startprojectaction_triggered(self): #通过菜单开始爬取
+        self.on_startButton_clicked()
+
+    @QtCore.pyqtSlot()
     def on_pauseButton_clicked(self): #暂停或者继续
         if self.running:
             self.running = not self.running
@@ -241,8 +246,16 @@ class mycrawl(QtGui.QMainWindow):
             self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
+    def on_pauseprojectaction_triggered(self): #通过菜单暂停爬取
+        self.on_pauseButton_clicked()
+
+    @QtCore.pyqtSlot()
     def on_stopButton_clicked(self): #停止爬取
         self.ctrl_conn[0].send('stop crawl')
+
+    @QtCore.pyqtSlot()
+    def on_stopprojectaction_triggered(self): #通过菜单停止爬取
+        self.on_stopButton_clicked()
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
@@ -259,6 +272,10 @@ class mycrawl(QtGui.QMainWindow):
                     self.spiderProcess.send_signal(9)
         except AttributeError:
             pass
+
+    @QtCore.pyqtSlot()
+    def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
+        self.closeEvent(event)
 
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
         with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
@@ -279,6 +296,11 @@ class mycrawl(QtGui.QMainWindow):
         lm.export_matrix()
         self.write_final_stats()
         QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
+
+##    @QtCore.pyqtSlot()
+##    def on_action1_triggered(self): #打开运行结果文件
+        
+    
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()

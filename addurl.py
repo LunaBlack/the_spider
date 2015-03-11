@@ -54,13 +54,8 @@ class addurl(QtGui.QDialog):
         text2 = allurl1.split('\n')
         return text2
 
-    
-    @QtCore.pyqtSlot()
-    def on_singleaddButton_clicked(self): #逐条添加url
-        text1 = self.readsingleaddtext()
-        text2 = self.readallurltext()
-        text = text1 + text2
 
+    def mergeurl(self, text): #将新添加的url与已存在的url合并
         try:
             for e in text:
                 temp = unicode(e.toUtf8(), "utf8").strip()
@@ -88,7 +83,15 @@ class addurl(QtGui.QDialog):
             self.logger.info("the url preview: %s" %list_text3)
             self.allurltextBrowser.setText(urlpreview)
 
+    
+    @QtCore.pyqtSlot()
+    def on_singleaddButton_clicked(self): #逐条添加url
+        text1 = self.readsingleaddtext()
+        text2 = self.readallurltext()
+        text = text1 + text2
+        self.mergeurl(text)
 
+        
     @QtCore.pyqtSlot()
     def on_wildcardpushButton_clicked(self): #用通配符*输入url格式
         text = self.siteformatlineEdit.text()[:self.siteformatlineEdit.cursorPosition()] + \
@@ -98,15 +101,16 @@ class addurl(QtGui.QDialog):
             
     def batchinputpreview(self): #预览批量输入的url
         list_text = []
-        
-        if self.arithmeticradioButton.isChecked(): #等差数列被选中
-            try:
-                temp = unicode(self.siteformatlineEdit.text().toUtf8(), "utf8").strip()
-                temp = temp.encode("ascii")
-            except UnicodeEncodeError:
-                QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
 
-            else:
+        try:
+            temp = unicode(self.siteformatlineEdit.text().toUtf8(), "utf8").strip()
+            temp = temp.encode("ascii")
+        except UnicodeEncodeError:
+            QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
+
+        else:
+            
+            if self.arithmeticradioButton.isChecked(): #等差数列被选中
                 if (str(self.arithmeticfirstitemlineEdit.text()).isdigit() and str(self.arithmeticitemnumberlineEdit.text()).isdigit() \
                    and int(str(self.arithmeticitemnumberlineEdit.text())) > 0 and str(self.tolerancelineEdit.text()).isdigit()): #等差数列各项参数正确
                     firstitem = int(self.arithmeticfirstitemlineEdit.text())
@@ -123,14 +127,7 @@ class addurl(QtGui.QDialog):
                 else:
                     QtGui.QMessageBox.about(self, u"参数错误", u"请重新输入等差数列的参数")
 
-        elif self.geometricradioButton.isChecked(): #等比数列被选中
-            try:
-                temp = unicode(self.siteformatlineEdit.text().toUtf8(), "utf8").strip()
-                temp = temp.encode("ascii")
-            except UnicodeEncodeError:
-                QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
-
-            else:
+            elif self.geometricradioButton.isChecked(): #等比数列被选中
                 if (str(self.geometricfirstitemlineEdit.text()).isdigit() and str(self.geometricitemnumberlineEdit.text()).isdigit() \
                     and int(str(self.geometricitemnumberlineEdit.text())) > 0 and str(self.ratiolineEdit.text()).isdigit()): #等比数列各项参数正确
                     firstitem = int(self.geometricfirstitemlineEdit.text())
@@ -147,14 +144,7 @@ class addurl(QtGui.QDialog):
                 else:
                     QtGui.QMessageBox.about(self, u"参数错误", u"请重新输入等比数列的参数")
 
-        elif self.alphabeticallyradioButton.isChecked(): #字母顺序被选中
-            try:
-                temp = unicode(self.siteformatlineEdit.text().toUtf8(), "utf8").strip()
-                temp = temp.encode("ascii")
-            except UnicodeEncodeError:
-                QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
-
-            else:
+            elif self.alphabeticallyradioButton.isChecked(): #字母顺序被选中
                 if (str(self.alphameticallyfromlineEdit.text()).isalpha() and len(self.alphameticallyfromlineEdit.text()) == 1 \
                     and str(self.alphameticallytolineEdit.text()).isalpha() and len(self.alphameticallytolineEdit.text()) == 1 \
                     and ord(str(self.alphameticallytolineEdit.text()).strip()) >= ord(str(self.alphameticallyfromlineEdit.text()).strip())): #字母顺序各项参数正确
@@ -181,33 +171,7 @@ class addurl(QtGui.QDialog):
         text1 = self.readbatchinputtext()
         text2 = self.readallurltext()
         text = text1 + text2
-
-        try:
-            for e in text:
-                temp = unicode(e.toUtf8(), "utf8").strip()
-                temp = temp.encode("ascii")
-        except UnicodeEncodeError:
-            QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
-
-        else:
-            list_text1 = []
-            for e in text:
-                list_text1.append(str(e).strip())
-            list_text2 = [e for e in list_text1 if e is not ""]
-            
-            number = 0
-            list_text3 = []
-            for e in list_text2:
-                if e not in list_text3:
-                    list_text3.append(e)
-                else:
-                    number = number + 1
-            if number != 0:
-                QtGui.QMessageBox.about(self, u"检测到重复", u"测试到%d条重复网址，已自动过滤" %number)
-
-            urlpreview = '\n'.join(list_text3)
-            self.logger.info("the url preview: %s" %list_text3)
-            self.allurltextBrowser.setText(urlpreview)
+        self.mergeurl(text)
 
 
     @QtCore.pyqtSlot()
@@ -234,33 +198,7 @@ class addurl(QtGui.QDialog):
         text1 = self.readtextimporttext()
         text2 = self.readallurltext()
         text = text1 + text2
-
-        try:
-            for e in text:
-                temp = unicode(e.toUtf8(), "utf8").strip()
-                temp = temp.encode("ascii")
-        except UnicodeEncodeError:
-            QtGui.QMessageBox.about(self, u"url格式错误", u"检测到含有中文或其它字符,请重新输入url")
-
-        else:
-            list_text1 = []
-            for e in text:
-                list_text1.append(str(e).strip())
-            list_text2 = [e for e in list_text1 if e is not ""]
-            
-            number = 0
-            list_text3 = []
-            for e in list_text2:
-                if e not in list_text3:
-                    list_text3.append(e)
-                else:
-                    number = number + 1
-            if number != 0:
-                QtGui.QMessageBox.about(self, u"检测到重复", u"测试到%d条重复网址，已自动过滤" %number)
-
-            urlpreview = '\n'.join(list_text3)
-            self.logger.info("the url preview: %s" %list_text3)
-            self.allurltextBrowser.setText(urlpreview)
+        self.mergeurl(text)
 
 
     @QtCore.pyqtSlot()
