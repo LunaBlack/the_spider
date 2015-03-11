@@ -4,7 +4,9 @@
 import sys, os
 import time, logging
 from multiprocessing import Process, Pipe
-import win32com.client, win32api
+import platform
+if platform.system() == 'Windows':
+    import win32com.client, win32api
 
 from PyQt4 import QtCore, QtGui, uic
 from addurl import addurl
@@ -299,33 +301,41 @@ class mycrawl(QtGui.QMainWindow):
         f_path = os.path.abspath(f_path)
         if os.path.exists(f_path):
             try:
-                win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
+                if platform.system() == 'Windows':
+                    win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
+                elif platform.system() == 'Linux':
+                    os.system('xdg-open {0}'.format(f_path))
             except:
                 QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
         else:
             QtGui.QMessageBox.about(self, u"文件不存在", u"文件不存在")
 
     def opentxtfile(self, f_path): #打开txt格式文件
-        if os.path.exists(f_path):
-            try:
-                win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
-            except:
-                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
+            if os.path.exists(f_path):
+                try:
+                    if platform.system() == 'Windows':
+                        win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
+                    else:
+                        os.system('xdg-open {0}'.format(f_path))
+                except:
+                    QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
+            else:
+                QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
         else:
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
-            
+
     @QtCore.pyqtSlot()
     def on_action2_triggered(self): #打开"各页面链接"文件
         f = self.name + "link_struct.txt"
         f_path = os.path.abspath(f_path)
         self.opentxtfile(f_path)
-        
+
     @QtCore.pyqtSlot()
     def on_action3_triggered(self): #打开"各页面抓取范围内链接"文件
         f = self.name + "inlink_struct.txt"
         f_path = os.path.abspath(f_path)
         self.opentxtfile(f_path)
-        
+
     @QtCore.pyqtSlot()
     def on_action4_triggered(self): #打开"各页面抓取范围外链接"文件
         f = self.name + "outlink_struct.txt"
@@ -342,19 +352,19 @@ class mycrawl(QtGui.QMainWindow):
                 QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
         else:
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
-                        
+
     @QtCore.pyqtSlot()
     def on_action5_triggered(self): #打开"站点的各类链接统计"文件
         f = self.name + "site links counts.csv"
         f_path = os.path.abspath(f_path)
         self.opencsvfile(f_path)
-        
+
     @QtCore.pyqtSlot()
     def on_action6_triggered(self): #打开"站点间链接统计"文件
         f = self.name + "site counts from-to.csv"
         f_path = os.path.abspath(f_path)
         self.opencsvfile(f_path)
-            
+
     @QtCore.pyqtSlot()
     def on_action7_triggered(self): #打开"站点间链接统计矩阵"文件
         f = self.name + "site matrix.csv"
@@ -372,14 +382,14 @@ class mycrawl(QtGui.QMainWindow):
         f = self.name + "page matrix.csv"
         f_path = os.path.abspath(f_path)
         self.opencsvfile(f_path)
-            
+
     @QtCore.pyqtSlot()
     def on_action10_triggered(self): #打开"页面间链接统计矩阵(去除全零行)"文件
         f = self.name + "page matrix strip.csv"
         f_path = os.path.abspath(f_path)
         self.opencsvfile(f_path)
 
-        
+
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
     main_conn.send("start crawl")
