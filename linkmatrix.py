@@ -8,25 +8,33 @@ import codecs
 import csv
 import os
 
+from readsetting import ReadSetting
+
+
 class LinkMatrix():
 
     def __init__(self, projectname):
         self.projectname = projectname
         self.roots = []
-        self.forwardlinks = dict()
-        self.backwardlinks = dict()
-        self.outlinks = dict()
 
-    def setroot(self, root):
+        rs = ReadSetting()
+        self.allowed_domains = rs.readalloweddomain()
+
+        self.entire_struct = dict() #保存网站所有的页面结构，referer、url在爬取范围内，不一定符合抓取下载规则
+        self.forwardlinks = dict() #保存所有下载下来的页面的页面的结构，referer、url符合抓取下载规则
+        self.outlinks = dict() #记录所有的外链，referer符合抓取下载规则，url在抓取下载范围外
+
+
+    def setroot(self, root): #将初始url加入到三个字典对象中(未修改)
         self.roots = root
         for e in self.roots:
+            self.entire_struct.setdefault(e, set())
             self.forwardlinks.setdefault(e, dict())
-            self.backwardlinks.setdefault(e, None)
             self.outlinks.setdefault(e, set())
 
-        self.known_site = [urlparse(url).hostname for url in self.roots]
+        self.root_site = [urlparse(url).hostname for url in self.roots]
 
-    def setIndexMap(self, index):
+    def setIndexMap(self, index): #为所有页面编号
         self.indexmap = index
 
     def addentirelink(self, url, referer):
@@ -233,83 +241,128 @@ class LinkMatrix():
             queue.extend(links[u].keys())
             yield u
 
-    def site_links_count(self):
+    def domain_links_count(self): #基于限制域的各类链接统计(所有下载条目均属于这些域)
         count = {}
-        #known_site = [urlparse(url).hostname for url in self.roots]
-        for root in self.roots:
-            hostname = urlparse(root).hostname
-            count.setdefault(hostname, {'Pages':0, 'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
-            #for e in self.iter_dfs(self.forwardlinks, root):
-            #    for l in self.forwardlinks[e].keys():
-            #        if urlparse(l).hostname in known_site:
-            #            count[hostname]['InterLinks'] += 1
+        for domain in self.allowed_domains:
+            count.setdefault(domain, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #Pages指属于该域的页面数
+            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
+            #InterLinks指条目对应的域内的页面;OutLinks指条目对应的域外的页面(包括下载范围外的页面)
+
+        for k,v in self.forwardlinks.items():
+            for domain in self.allowed_domains:
+                if domain in k:
+                    from_domain = domain
+                    count[from_domain]['Pages'] += 1
+                    break
+            for t in v.keys():
+                for domain in self.allowed_domains:
+                    if domain in t:
+                        to_domain = domain
+                        if to_domain == from_domain:
+                            count[from_domain]['InterLinks'] += 1
+                        else:
+                            count[from_domain]['OutLinks'] += 1
+                        break
+                count[from_host]['KnownLinks'] += 1
+
+        for k,v in self.outlinks.items():
+            for domain in self.allowed_domains:
+                if domain in k:
+                    from_domain = domain
+                    break
+            count[from_domain]['OutLinks'] += len(v)
+            count[from_domain]['UnknownLinks'] += len(v)
+
+        return count
+
+    def site_links_count(self): #基于初始url对应站点的各类链接统计(部分下载条目可能不属于这些站点)
+        count = {}
+        for site in self.root_site:
+            count.setdefault(site, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #Pages指站点包含的页面数
+            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
+            #InterLinks指本站点内的页面;OutLinks指本站点外的页面(包括下载范围外的页面)
 
         for k,v in self.forwardlinks.items():
             try:
                 from_host = urlparse(k).hostname
-                count[from_host]['Pages'] += 1
-                for t in v.keys():
-                    to_host = urlparse(t).hostname
-                    if to_host == from_host:
-                        count[from_host]['InterLinks'] += 1
-                    else:
-                        count[from_host]['OutLinks'] += 1
-                    count[from_host]['Knowlinks'] += 1
+                if from_host in self.root_site:
+                    count[from_host]['Pages'] += 1
+                    for t in v.keys():
+                        to_host = urlparse(t).hostname
+                        if to_host == from_host:
+                            count[from_host]['InterLinks'] += 1
+                        else:
+                            count[from_host]['OutLinks'] += 1
+                        count[from_host]['KnownLinks'] += 1
             except KeyError as err:
                 print(err)
 
         for k,v in self.outlinks.items():
             try:
-                count[urlparse(k).hostname]['OutLinks'] += len(v)
-                count[urlparse(k).hostname]['Unknowlinks'] += len(v)
+                from_host = urlparse(k).hostname
+                if from_host in self.root_site:
+                    count[from_host]['OutLinks'] += len(v)
+                    count[from_host]['UnknownLinks'] += len(v)
             except KeyError as err:
                 print(err)
 
         return count
 
-    def page_links_count(self):
+    def page_links_count(self): #基于下载条目的各类链接统计
         count = {}
         for k,v in self.forwardlinks.items():
             from_host = urlparse(k).hostname
-            count.setdefault(k, {'Knowlinks':0, 'Unknowlinks':0, 'InterLinks':0, 'OutLinks':0})
+            count.setdefault(k, {'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
+            #InterLinks指条目对应的站点内的页面;OutLinks指条目对应的站点外的页面(包括下载范围外的页面)
+
             for t in v.keys():
                 to_host = urlparse(t).hostname
                 if to_host == from_host:
                     count[k]['InterLinks'] += 1
                 else:
                     count[k]['OutLinks'] += 1
-                count[k]['Knowlinks'] += 1
+                count[k]['KnownLinks'] += 1
 
         for k,v in self.outlinks.items():
             count[k]['OutLinks'] += len(v)
-            count[k]['Unknowlinks'] += len(v)
+            count[k]['UnknownLinks'] += len(v)
 
         return count
 
-    def site_count_fromto(self):
+    def site_count_fromto(self): #基于初始url对应站点之间的链接统计(部分下载条目可能不属于这些站点)
         count = dict()
-        for root in self.roots:
-            count.setdefault(urlparse(root).hostname, dict())
+        for site in self.root_site:
+            count.setdefault(site, dict())
 
         for e in self.forwardlinks.keys():
             from_host = urlparse(e).hostname
-            for t in self.forwardlinks[e].keys():
-                to_host = urlparse(t).hostname
-                count[from_host].setdefault(to_host, 0)
-                count[from_host][to_host] += 1
+            if from_host in self.root_site:
+                for t in self.forwardlinks[e].keys():
+                    to_host = urlparse(t).hostname
+                    if to_host in self.root_site:
+                        count[from_host].setdefault(to_host, 0)
+                        count[from_host][to_host] += 1
 
         return count
 
-    def domain_count_fromto(self): #(暂时无用)
+    def domain_count_fromto(self): #基于限制域之间的链接统计(所有下载条目均属于这些域)
         count = dict()
-        for root in self.roots:
-            domain = urlparse(root).hostname.split('.')[1]
+        for domain in self.allowed_domains:
             count.setdefault(domain, dict())
 
         for e in self.forwardlinks.keys():
-            from_domain = urlparse(e).hostname.split('.')[1]
+            for domain in self.allowed_domains:
+                if domain in e:
+                    from_domain = domain
+                    break
             for t in self.forwardlinks[e].keys():
-                to_domain = urlparse(t).hostname.split('.')[1]
+                for domain in self.allowed_domains:
+                    if domain in t:
+                        to_domain = domain
+                        break
                 count[from_domain].setdefault(to_domain, 0)
                 count[from_domain][to_domain] += 1
 
