@@ -197,7 +197,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        self.rule = "xpath"
+        self.rule = "domain"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
 
@@ -253,8 +253,7 @@ class mycrawl(QtGui.QMainWindow):
                 self.spiderProcess.terminate()
                 time.sleep(3)
                 if self.spiderProcess.is_alive():
-                    print("""
-===========================send signal 9==================================""")
+                    print("===========================send signal 9==================================")
                     self.spiderProcess.send_signal(9)
         except AttributeError:
             pass

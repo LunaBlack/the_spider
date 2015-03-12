@@ -97,6 +97,9 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         elif domain is None:
             domain = tuple()
 
+        if isinstance(url, str):
+            url = (url, )
+
         return (domain, url)
 
 
@@ -175,3 +178,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                 savingformat = self.text[m].strip()
                 break
         return savingformat
+
+if __name__ == '__main__':
+    rs = ReadSetting()
+    print(rs.readxpath())
