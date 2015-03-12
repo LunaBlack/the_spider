@@ -3,7 +3,8 @@
 
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
-from scrapy import log
+from scrapy.log import INFO
+from scrapy.log import ERROR
 
 from myproject.items import MyprojectItem
 from readsetting import ReadSetting
@@ -30,12 +31,12 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
 
 
     def parse_domain(self, response):
-        self.log('receive response from {0}'.format(response.url), log.INFO)
+        self.log('receive response from {0}'.format(response.url), INFO)
         myitem = MyprojectItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
         if 'redirect_urls' in response.meta:
-            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), log.INFO)
+            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), INFO)
         try:
             response.selector.remove_namespaces()
             title_exp = response.xpath("//title/text()").extract()
@@ -45,7 +46,7 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
                 myitem['title'] = ''
             myitem['body'] = response.body
         except AttributeError:
-            self.log("not TextResponse: {0}".format(type(response)), log.ERROR)
+            self.log("not TextResponse: {0}".format(type(response)), ERROR)
             myitem['title'] = ''
             myitem['body'] = response.body
         finally:

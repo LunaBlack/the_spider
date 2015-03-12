@@ -76,7 +76,8 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
 
 
     def readxpath(self): #读取指定的Xpath表达式
-        domain = url = ""
+        domain = None
+        url = ''
 
         for n,i in enumerate(self.text):
             if i.startswith("xpath:"):
@@ -89,10 +90,12 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
                     m = m + 1
                 break
 
-        if type(domain) == str:
-            domain = [domain, ]
-        else:
-            domain = list(set(domain))
+        if isinstance(domain, str):
+            domain = (domain, )
+        elif isinstance(domain, tuple):
+            domain = tuple(set(domain))
+        elif domain is None:
+            domain = tuple()
 
         return (domain, url)
 
