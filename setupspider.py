@@ -10,6 +10,7 @@ from scrapy.utils.project import get_project_settings
 from myproject.spiders.auto_spider import AutoSpider #此三行导入项目中spider目录下可用的spider类
 from myproject.spiders.domain_spider import DomainSpider
 from myproject.spiders.xpath_spider import XpathSpider
+from myproject.spiders.xpathspider2 import XpathSpider2
 
 from GlobalLogging import GlobalLogging
 
@@ -50,24 +51,20 @@ class setupspider():
         if self.ctrl_conn.poll(): #查询是否接收到控制信息
             c = self.ctrl_conn.recv()
             if c == 'stop crawl':
-                print("""
-=============================received stop==================================""")
+                print("=============================received stop==================================")
                 self.crawler.stop()
             elif c == 'pause crawl':
-                print("""
-=============================received pause=================================""")
+                print("=============================received pause=================================")
                 self.crawler.engine.pause()
                 while 1:
                     if self.ctrl_conn.poll(1):
                         c = self.ctrl_conn.recv()
                         if c == 'unpause crawl':
-                            print("""
-=============================received unpause===============================""")
+                            print("=============================received unpause===============================")
                             self.crawler.engine.unpause()
                             break
                         elif c == 'stop crawl':
-                            print("""
-=============================received stop==================================""")
+                            print("=============================received stop==================================")
                             self.crawler.stop()
                             break
 
@@ -80,7 +77,7 @@ class setupspider():
         elif self.rule == "domain":
             self.spider = DomainSpider()   #创建一个domain_spider的爬虫实例
         elif self.rule == "xpath":
-            self.spider = XpathSpider()   #创建一个xpath_spider的爬虫实例
+            self.spider = XpathSpider2()   #创建一个xpath_spider的爬虫实例
 
         if self.spider:
             self.crawler.crawl(self.spider)

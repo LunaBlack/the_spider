@@ -16,7 +16,6 @@ from linkmatrix import LinkMatrix
 
 class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
     name = "xpathspider"
-    number = 0
 
     def __init__(self):
         rs = ReadSetting()

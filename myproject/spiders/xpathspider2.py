@@ -7,21 +7,29 @@ from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.utils.response import get_base_url
 from scrapy.utils.url import urljoin_rfc
+from scrapy.http import Request
+from scrapy.log import INFO
+from scrapy.log import ERROR
+
 from myproject.items import MyprojectItem
 from readsetting import ReadSetting
+from linkmatrix import LinkMatrix
 
 
-class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
-    name = "xpathspider"
+class XpathSpider2(CrawlSpider): #当url获取规则为“Xpath表达式”
+    name = "xpathspider2"
 
     def __init__(self):
         rs = ReadSetting()
         self.start_urls = rs.readurl()
-        domain, url = rs.readxpath()
-        self.allowed_domains = domain
-        self.rules = [Rule(LinkExtractor(restrict_xpaths = url), follow=True, callback="parse_xpath_item")]
+        self.linkmatrix = LinkMatrix(rs.projectname())
+        self.linkmatrix.setroot(self.start_urls)
 
-        super(XpathSpider, self).__init__()
+        domain, self.url = rs.readxpath()
+        self.allowed_domains = domain
+        self.rules = [Rule(LinkExtractor(restrict_xpaths = self.url), follow=True, callback="parse_xpath_item")]
+
+        super(XpathSpider2, self).__init__()
 
 
     #def parse_start_url(self, response):
@@ -50,14 +58,14 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
 
 
     def parse_xpath_item(self, response):
-        self.log('receive response from {0}'.format(response.url), log.INFO)
+        self.log('receive response from {0}'.format(response.url), INFO)
         response.selector.remove_namespaces()
 
         myitem = MyprojectItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
         if 'redirect_urls' in response.meta:
-            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), log.INFO)
+            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), INFO)
         try:
             response.selector.remove_namespaces()
             title_exp = response.xpath("//title/text()").extract()
@@ -67,7 +75,7 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
                 myitem['title'] = ''
             myitem['body'] = response.body
         except AttributeError:
-            self.log("not TextResponse: {0}".format(type(response)), log.ERROR)
+            self.log("not TextResponse: {0}".format(type(response)), ERROR)
             myitem['title'] = ''
             myitem['body'] = response.body
         finally:
