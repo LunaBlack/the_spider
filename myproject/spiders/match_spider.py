@@ -11,8 +11,8 @@ from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
 
-class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定路径”
-    name = "domainspider"
+class MatchSpider(CrawlSpider): #当url获取规则为“域名匹配及指定路径”
+    name = "matchspider"
 
     def __init__(self):
 
@@ -27,7 +27,7 @@ class DomainSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         self.rules = [Rule( LinkExtractor(allow = domains[1], deny = domains[2]),
             follow=True, callback="parse_domain")]
 
-        super(DomainSpider, self).__init__()
+        super(MatchSpider, self).__init__()
 
 
     def parse_domain(self, response):

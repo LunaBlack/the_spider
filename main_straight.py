@@ -145,19 +145,19 @@ class mycrawl(QtGui.QMainWindow):
         self.rule = "auto"
 
     @QtCore.pyqtSlot()
-    def on_matchradioButton_clicked(self): #选择url获取规则为“域名匹配及路径选择”
-        self.logger.info("choose domainspider")
+    def on_matchradioButton_clicked(self): #选择url获取规则为“网址匹配及路径选择”
+        self.logger.info("choose matchspider")
         self.ruleplainTextEdit.setPlainText(\
-            "allowed_domains=('example.com')\nallow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')\ndeny=('shownodir\.aspx')")
-        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,三项均\n非必选项,\n一行一项")
-        self.rule = "domain"
+            "allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')\ndeny=('shownodir\.aspx')")
+        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,两项均\n非必选项,\n一行一项")
+        self.rule = "match"
 
     @QtCore.pyqtSlot()
     def on_xpathradioButton_clicked(self): #选择url获取规则为“Xpath表达式”
         self.logger.info("choose xpathspider")
         self.ruleplainTextEdit.setPlainText(\
-            "allowed_domains=('example.com')\nurl='//ul/li//div[2]/h2/a/@href'")
-        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
+            "url='//ul/li//div[2]/h2/a/@href'")
+        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,该选项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
     def check_ready(self):
@@ -183,8 +183,12 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
             f.write("\n\ninitial url: \n" + self.urltextBrowser.toPlainText())
             f.write("\n\nrule: \n" + self.rule)
-            if self.rule == "domain":
-                f.write("\n\ndomain: \n" + self.ruleplainTextEdit.toPlainText())
+            if not self.rangeplainTextEdit.toPlainText():
+                f.write("\n\nallowed domain: \nallowed_domains=('')")
+            else:
+                f.write("\n\nallowed domain: \n" + self.rangeplainTextEdit.toPlainText())
+            if self.rule == "match":
+                f.write("\n\nurl match: \n" + self.ruleplainTextEdit.toPlainText())
             elif self.rule == "xpath":
                 f.write("\n\nxpath: \n" + self.ruleplainTextEdit.toPlainText())
             f.write("\n\nlargest number of pages: \n" + str(self.pagenumberspinBox.value()))
@@ -197,7 +201,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        self.rule = "domain"
+        self.rule = "match"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
 
@@ -283,7 +287,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
-        self.closeEvent(event)
+        self.close()
 
     @QtCore.pyqtSlot()
     def on_buildoutputaction_triggered(self):
