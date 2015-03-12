@@ -8,12 +8,12 @@
 import scrapy
 
 
-class MyprojectItem(scrapy.Item):
+class CrawledItem(scrapy.Item):
     url = scrapy.Field()
-    idnumber = scrapy.Field()
+    referer = scrapy.Field()
     title = scrapy.Field()
     body = scrapy.Field()
+
+class PassItem(scrapy.Item):
+    url = scrapy.Field()
     referer = scrapy.Field()
-##    name = scrapy.Field()
-##    description = scrapy.Field()
-##    size = scrapy.Field()

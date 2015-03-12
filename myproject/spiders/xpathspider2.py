@@ -11,7 +11,7 @@ from scrapy.http import Request
 from scrapy.log import INFO
 from scrapy.log import ERROR
 
-from myproject.items import MyprojectItem
+from myproject.items import CrawledItem
 from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
@@ -35,7 +35,7 @@ class XpathSpider2(CrawlSpider): #当url获取规则为“Xpath表达式”
     #def parse_start_url(self, response):
     #    response.selector.remove_namespaces()
 
-    #    myitem_temp = MyprojectItem()
+    #    myitem_temp = CrawledItem()
     #    myitem_temp['url'] = response.xpath(self.url).extract()
 
     #    base_url = get_base_url(response)
@@ -61,7 +61,7 @@ class XpathSpider2(CrawlSpider): #当url获取规则为“Xpath表达式”
         self.log('receive response from {0}'.format(response.url), INFO)
         response.selector.remove_namespaces()
 
-        myitem = MyprojectItem()
+        myitem = CrawledItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
         if 'redirect_urls' in response.meta:

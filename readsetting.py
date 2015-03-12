@@ -49,6 +49,7 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
             domain = tuple(set(domain))
         elif domain is None:
             domain = tuple()
+
         return domain
 
 
@@ -170,4 +171,4 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
 
 if __name__ == '__main__':
     rs = ReadSetting()
-    print(rs.readxpath())
+    print(rs.readalloweddomain())

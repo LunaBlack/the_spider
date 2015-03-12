@@ -6,7 +6,7 @@ from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.log import INFO
 from scrapy.log import ERROR
 
-from myproject.items import MyprojectItem
+from myproject.items import CrawledItem
 from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
@@ -32,7 +32,7 @@ class MatchSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
 
     def parse_domain(self, response):
         self.log('receive response from {0}'.format(response.url), INFO)
-        myitem = MyprojectItem()
+        myitem = CrawledItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
         if 'redirect_urls' in response.meta:

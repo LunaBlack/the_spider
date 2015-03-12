@@ -29,6 +29,15 @@ class LinkMatrix():
     def setIndexMap(self, index):
         self.indexmap = index
 
+    def addentirelink(self, url, referer):
+        pass
+
+    def addforwardlink(self, url, referer):
+        return False
+
+    def addoutlink(self, url, referer):
+        pass
+
     def addLink(self, url, referer):
         if urlparse(url).hostname not in self.known_site:
             return True #not download
