@@ -35,20 +35,12 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         return url
 
 
-    def readdomain(self): #读取指定的域名或路径
-        domain = allow = deny = None
-
+    def readalloweddomain(self): #读取限定域
+        domain = None
         for n,i in enumerate(self.text):
-            if i.startswith("domain:"):
+            if i.startswith("allowed domain:"):
                 m = n + 1
-                while self.text[m].strip() is not "":
-                    if self.text[m].startswith("allowed_domains="):
-                        domain = eval(self.text[m][16:])
-                    elif self.text[m].startswith("allow="):
-                        allow = eval(self.text[m][6:])
-                    elif self.text[m].startswith("deny="):
-                        deny = eval(self.text[m][5:])
-                    m = m + 1
+                domain = eval(self.text[m][16:])
                 break
 
         if isinstance(domain, str):
@@ -57,6 +49,21 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
             domain = tuple(set(domain))
         elif domain is None:
             domain = tuple()
+        return domain
+
+
+    def readurlmatch(self): #读取指定的网址格式或路径
+        allow = deny = None
+        for n,i in enumerate(self.text):
+            if i.startswith("url match:"):
+                m = n + 1
+                while self.text[m].strip() is not "":
+                    if self.text[m].startswith("allow="):
+                        allow = eval(self.text[m][6:])
+                    elif self.text[m].startswith("deny="):
+                        deny = eval(self.text[m][5:])
+                    m = m + 1
+                break
 
         if isinstance(allow, str):
             allow = (allow, )
@@ -72,35 +79,17 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         elif deny is None:
             deny = tuple()
 
-        return (domain, allow, deny)
+        return (allow, deny)
 
 
     def readxpath(self): #读取指定的Xpath表达式
-        domain = None
         url = ''
-
         for n,i in enumerate(self.text):
             if i.startswith("xpath:"):
                 m = n + 1
-                while self.text[m].strip() is not "":
-                    if self.text[m].startswith("allowed_domains="):
-                        domain = eval(self.text[m][16:])
-                    elif self.text[m].startswith("url="):
-                        url = eval(self.text[m][4:])
-                    m = m + 1
+                url = eval(self.text[m][4:])
                 break
-
-        if isinstance(domain, str):
-            domain = (domain, )
-        elif isinstance(domain, tuple):
-            domain = tuple(set(domain))
-        elif domain is None:
-            domain = tuple()
-
-        if isinstance(url, str):
-            url = (url, )
-
-        return (domain, url)
+        return url
 
 
     def pagenumber(self): #读取最大抓取页面数的参数

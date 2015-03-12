@@ -38,7 +38,7 @@
        <attribute name="title">
         <string>设置</string>
        </attribute>
-       <layout class="QVBoxLayout" name="settingLayout" stretch="40,35,38">
+       <layout class="QVBoxLayout" name="settingLayout" stretch="38,25,35,38">
         <property name="spacing">
          <number>15</number>
         </property>
@@ -130,6 +130,55 @@
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="rangegroupBox">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>爬取范围</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout" stretch="29,132,10">
+           <property name="spacing">
+            <number>14</number>
+           </property>
+           <property name="leftMargin">
+            <number>28</number>
+           </property>
+           <property name="rightMargin">
+            <number>12</number>
+           </property>
+           <property name="bottomMargin">
+            <number>9</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="rangelabel">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置爬取范围&lt;/p&gt;&lt;p&gt;即:设置限定域&lt;/p&gt;&lt;p&gt;爬取的url必须在域内&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="rangeplainTextEdit">
+             <property name="plainText">
+              <string>allowed_domains=('example.com', 'im.nju.edu.cn')</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="rangetextlabel">
+             <property name="text">
+              <string>按范例将引号
+中内容替换；
+不限定则清空</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="rulegroupBox">
           <property name="font">
            <font>
@@ -137,7 +186,7 @@
            </font>
           </property>
           <property name="title">
-           <string>URL获取规则</string>
+           <string>页面抓取规则</string>
           </property>
           <layout class="QHBoxLayout" name="rulegroupLayout" stretch="25,130,10">
            <property name="spacing">
@@ -157,14 +206,14 @@
              <item>
               <widget class="QRadioButton" name="autoacquireradioButton">
                <property name="text">
-                <string>从页面自动分析获取</string>
+                <string>从页面自动抓取</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QRadioButton" name="matchradioButton">
                <property name="text">
-                <string>域名匹配及指定路径</string>
+                <string>网址匹配及指定路径</string>
                </property>
               </widget>
              </item>
@@ -1114,7 +1163,7 @@ Xpath表达式</string>
   </action>
   <action name="action_14">
    <property name="text">
-    <string>  </string>
+    <string/>
    </property>
   </action>
  </widget>

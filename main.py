@@ -41,11 +41,12 @@ class mycrawl(QtGui.QMainWindow):
         self.downloaditem_count = '0'
 
     def updateOutput(self): #将结果信息显示在界面
-        self.runningtime += self.running and 0.5 or 0
+        self.runningtime += self.running and 0.5 or 0 #若self.running为True,则加0.5;否则不加
         hour = int(self.runningtime)//3600
         minute = int(self.runningtime - hour*3600) // 60
         second = int(self.runningtime) % 60
         self.runtimeLabel.setText("{0:02}:{1:02}:{2:02}".format(hour, minute, second))
+        #相当于 "%02d:%02d:%02d" % (hour, minute, second),其中02d指把整数扩展成两位,不足的用0填充
 
         s = list()
         stoped = None
@@ -84,8 +85,8 @@ class mycrawl(QtGui.QMainWindow):
                 stoped = True
                 self.spiderProcess.terminate()
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
-                self.statusLabel.setText(u"已完成") #改变运行状态Label
-                QtGui.QMessageBox.about(self, u"已完成", u"爬虫已完成")
+                self.statusLabel.setText(u"已结束") #改变运行状态Label
+                QtGui.QMessageBox.about(self, u"已结束", u"爬虫已结束")
 
         if stoped:
             #self.timer.singleShot(500, self.updateOutput) #500毫秒执行一次
@@ -145,19 +146,19 @@ class mycrawl(QtGui.QMainWindow):
         self.rule = "auto"
 
     @QtCore.pyqtSlot()
-    def on_matchradioButton_clicked(self): #选择url获取规则为“域名匹配及路径选择”
-        self.logger.info("choose domainspider")
+    def on_matchradioButton_clicked(self): #选择url获取规则为“网址匹配及路径选择”
+        self.logger.info("choose matchspider")
         self.ruleplainTextEdit.setPlainText(\
-            "allowed_domains=('example.com')\nallow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')\ndeny=('shownodir\.aspx')")
-        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,三项均\n非必选项,\n一行一项")
-        self.rule = "domain"
+            "allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')\ndeny=('shownodir\.aspx')")
+        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,两项均\n非必选项,\n一行一项")
+        self.rule = "match"
 
     @QtCore.pyqtSlot()
     def on_xpathradioButton_clicked(self): #选择url获取规则为“Xpath表达式”
         self.logger.info("choose xpathspider")
         self.ruleplainTextEdit.setPlainText(\
-            "allowed_domains=('example.com')\nurl='//ul/li//div[2]/h2/a/@href'")
-        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,后一项\n为必选项,\n一行一项")
+            "url='//ul/li//div[2]/h2/a/@href'")
+        self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,该选项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
     def check_ready(self): #检查是否所有参数都已设置好
@@ -183,8 +184,12 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
             f.write("\n\ninitial url: \n" + self.urltextBrowser.toPlainText())
             f.write("\n\nrule: \n" + self.rule)
-            if self.rule == "domain":
-                f.write("\n\ndomain: \n" + self.ruleplainTextEdit.toPlainText())
+            if not self.rangeplainTextEdit.toPlainText():
+                f.write("\n\nallowed domain: \nallowed_domains=('')")
+            else:
+                f.write("\n\nallowed domain: \n" + self.rangeplainTextEdit.toPlainText())
+            if self.rule == "match":
+                f.write("\n\nurl match: \n" + self.ruleplainTextEdit.toPlainText())
             elif self.rule == "xpath":
                 f.write("\n\nxpath: \n" + self.ruleplainTextEdit.toPlainText())
             f.write("\n\nlargest number of pages: \n" + str(self.pagenumberspinBox.value()))
@@ -238,12 +243,12 @@ class mycrawl(QtGui.QMainWindow):
     def on_pauseButton_clicked(self): #暂停或者继续
         if self.running:
             self.running = not self.running
-            self.pauseButton.setText(u"恢复")
+            self.pauseButton.setText(u"恢复") #改变按钮文字
             self.statusLabel.setText(u"暂停") #改变运行状态Label
             self.ctrl_conn[0].send('pause crawl')
         else:
             self.running = not self.running
-            self.pauseButton.setText(u"暂停")
+            self.pauseButton.setText(u"暂停") #改变按钮文字
             self.statusLabel.setText(u"正在运行") #改变运行状态Label
             self.ctrl_conn[0].send('unpause crawl')
 
@@ -270,48 +275,35 @@ class mycrawl(QtGui.QMainWindow):
                 time.sleep(3)
                 if self.spiderProcess.is_alive():
                     print(" ===========================send signal 9==================================")
-                    self.spiderProcess.send_signal(9)
+                    self.spiderProcess.send_signal(9) #强制结束进程
         except AttributeError:
             pass
 
     @QtCore.pyqtSlot()
     def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
-        self.closeEvent(event)
+        self.close() #自动触发self.closeEvent()函数
 
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
         with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
             lines = []
-            lines.append("downloader/request_count: {0}\n".format(self.request_count) )
-            lines.append("downloader/response_count: {0}\n".format(self.response_count) )
-            lines.append("downloader/response_bytes: {0}\n".format(self.response_bytes) )
-            lines.append("downloader/response_status_count/200: {0}\n".format(self.response_200_count) )
-            lines.append("item_scraped_count: {0}\n".format(self.item_scraped_count) )
-            lines.append("downloaditem : {0}\n".format(self.downloaditem_count) )
+            lines.append(u"运行时间 : {0}\n".format(self.runtimeLabel.text()) )
+            lines.append(u"请求页面数 : {0}\n".format(self.request_count) )
+            lines.append(u"响应页面数 : {0}\n".format(self.response_count) )
+            lines.append(u"响应字节数 : {0}\n".format(self.response_bytes) )
+            lines.append(u"响应成功页面数(200) : {0}\n".format(self.response_200_count) )
+            lines.append(u"抓取条目数 : {0}\n".format(self.item_scraped_count) )
+            lines.append(u"成功下载条目数 : {0}\n".format(self.downloaditem_count) )
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
     def on_buildoutputaction_triggered(self): #生成统计矩阵
         lm = LinkMatrix(self.projectnameLabel.text())
-        lm.load()
+        lm.load() #读取以数据流形式写入的文件
         #lm.export_matrix(self.projectnameLabel.text())
-        lm.export_matrix()
-        self.write_final_stats()
+        lm.export_matrix() #生成统计矩阵
+        self.write_final_stats() #生成结果文件,显示爬取结果的各项数据
         QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
 
-    @QtCore.pyqtSlot()
-    def on_action1_triggered(self): #打开"运行结果"文件
-        f = self.name + "final stats.txt"
-        f_path = os.path.abspath(f_path)
-        if os.path.exists(f_path):
-            try:
-                if platform.system() == 'Windows':
-                    win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
-                elif platform.system() == 'Linux':
-                    os.system('xdg-open {0}'.format(f_path))
-            except:
-                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
-        else:
-            QtGui.QMessageBox.about(self, u"文件不存在", u"文件不存在")
 
     def opentxtfile(self, f_path): #打开txt格式文件
         if os.path.exists(f_path):
@@ -325,6 +317,11 @@ class mycrawl(QtGui.QMainWindow):
         else:
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
 
+    @QtCore.pyqtSlot()
+    def on_action1_triggered(self): #打开"运行结果"文件
+        f = self.name + "final stats.txt"
+        f_path = os.path.abspath(f_path)
+        self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action2_triggered(self): #打开"各页面链接"文件
