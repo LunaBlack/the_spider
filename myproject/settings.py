@@ -40,7 +40,7 @@ COOKIES_ENABLED = False #禁止cookies
 
 AJAXCRAWL_ENABLED = True #启用“Ajax Crawlable Pages”爬取
 
-REDIRECT_ENABLED = True
+REDIRECT_ENABLED = True #允许重定向
 
 STATS_CLASS = 'statscollect.SpiderStatsCollector' #设置状态收集器
 
