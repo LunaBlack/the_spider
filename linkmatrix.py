@@ -21,7 +21,7 @@ class LinkMatrix():
         self.allowed_domains = rs.readalloweddomain()
 
         self.entire_struct = dict() #保存网站所有的页面结构,referer、url在爬取范围(限制域)内,不一定符合抓取下载规则
-        self.forwardlinks = dict() #保存所有下载下来的页面的页面的结构,referer、url符合抓取下载规则
+        self.forwardlinks = dict() #保存所有抓取下载范围内的页面的结构,referer、url符合抓取下载规则
         self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外
 
 
@@ -34,7 +34,7 @@ class LinkMatrix():
 
         self.root_site = [urlparse(url).hostname for url in self.roots]
 
-    def setIndexMap(self, index): #为所有页面编号
+    def setIndexMap(self, index): #为符合下载条件的页面编号,index形式为{url:index}
         self.indexmap = index
 
     def addentirelink(self, url, referer): #构建entire_struct字典对象
@@ -152,7 +152,7 @@ class LinkMatrix():
                         else:
                             count[from_domain]['OutLinks'] += 1
                         break
-                count[from_host]['KnownLinks'] += 1
+                count[from_domain]['KnownLinks'] += 1
 
         for k,v in self.outlinks.items():
             for domain in self.allowed_domains:
@@ -439,7 +439,7 @@ class LinkMatrix():
                         else:
                             count[from_domain]['OutLinks'] += 1
                         break
-                count[from_host]['KnownLinks'] += 1
+                count[from_domain]['KnownLinks'] += 1
 
         return count
 

@@ -35,7 +35,7 @@ class OffsiteMiddleware(object):
                         self.stats.inc_value('offsite/domains', spider=spider)
                         log.msg(format="Filtered offsite request to %(domain)r: %(request)s",
                                 level=log.DEBUG, spider=spider, domain=domain, request=x)
-                    spider.linkmatrix.addOutLink(x.url, x.headers['Referer'])
+                    spider.linkmatrix.addoutlink(x.url, x.headers['Referer'])
                     self.stats.inc_value('offsite/filtered', spider=spider)
             else:
                 yield x
