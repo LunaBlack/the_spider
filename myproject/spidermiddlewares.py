@@ -11,6 +11,7 @@ from scrapy import log
 class OffsiteMiddleware(object):
 
     def __init__(self, stats):
+        print("+OffsiteMiddleware")
         self.stats = stats
 
     @classmethod
@@ -23,6 +24,9 @@ class OffsiteMiddleware(object):
         for x in result:
             if isinstance(x, Request):
                 if x.dont_filter or self.should_follow(x, spider):
+                    domain = urlparse_cached(x).hostname
+                    log.msg(format="Pass request to %(domain)r: %(request)s (%(donot)s)",
+                            level=log.DEBUG, spider=spider, domain=domain, request=x, donot=x.dont_filter)
                     yield x
                 else:
                     domain = urlparse_cached(x).hostname
@@ -45,12 +49,16 @@ class OffsiteMiddleware(object):
     def get_host_regex(self, spider):
         """Override this method to implement a different offsite policy"""
         allowed_domains = getattr(spider, 'allowed_domains', None)
+        print(allowed_domains)
         if not allowed_domains:
             return re.compile('') # allow all by default
         regex = r'^(.*\.)?(%s)$' % '|'.join(re.escape(d) for d in allowed_domains if d is not None)
+        #log.msg(format="Filter regex: %(regex)s", level=log.DEBUG, regex=regex)
+        print(regex)
         return re.compile(regex)
 
     def spider_opened(self, spider):
+        print("+OffsiteMiddleware spider_opened")
         self.host_regex = self.get_host_regex(spider)
         self.domains_seen = set()
 

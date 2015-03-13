@@ -6,12 +6,12 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 
-import os
-import json
-import csv
+import os, json, csv
 from scrapy.exceptions import DropItem
+
 from readsetting import ReadSetting
 from GlobalLogging import GlobalLogging
+from myproject.items import CrawledItem, PassItem
 
 
 class SavePipeline(object): #下载所有item对应的网页
@@ -86,9 +86,16 @@ class StatisticsPipeline(object):
 
     def process_item(self, item, spider):
 
-        if spider.linkmatrix.addLink(item['url'], item['referer']):
-            #print ("Duplicate item found: %s" % item)
-            raise DropItem("Duplicate item found: %s" % item)
-        else:
-            return item
+        if isinstance(item, PassItem):
+            spider.linkmatrix.addentirelink(item['url'], item['referer'])
+            spider.linkmatrix.addoutlink(item['url'], item['referer'])
+            raise DropItem("PassItem: %s" % item['url'])
+
+        elif isinstance(item, CrawledItem):
+
+            if spider.linkmatrix.addforwardlink(item['url'], item['referer']):
+                #print ("Duplicate item found: %s" % item)
+                raise DropItem("Duplicate item found: %s" % item['url'])
+            else:
+                return item
 

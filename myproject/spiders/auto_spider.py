@@ -6,7 +6,7 @@ from scrapy.contrib.linkextractors import LinkExtractor
 #from scrapy.http import TextResponse
 from scrapy import log
 
-from myproject.items import MyprojectItem
+from myproject.items import CrawledItem
 from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
@@ -27,7 +27,7 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动分析获
 
 
     def parse_auto(self, response):
-        myitem = MyprojectItem()
+        myitem = CrawledItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
 

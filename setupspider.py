@@ -10,7 +10,7 @@ from scrapy.utils.project import get_project_settings
 from myproject.spiders.auto_spider import AutoSpider #此三行导入项目中spider目录下可用的spider类
 from myproject.spiders.match_spider import MatchSpider
 from myproject.spiders.xpath_spider import XpathSpider
-from myproject.spiders.xpathspider2 import XpathSpider2
+#from myproject.spiders.xpathspider2 import XpathSpider2
 
 from GlobalLogging import GlobalLogging
 
@@ -70,14 +70,14 @@ class setupspider():
 
 
     def run(self):
-        log.start(logfile = "scrapy_log.txt", loglevel = "INFO", logstdout = False)
+        log.start(logfile = "scrapy_log.txt", loglevel = "DEBUG", logstdout = False)
 
         if self.rule == "auto":
             self.spider = AutoSpider()   #创建一个auto_spider的爬虫实例
         elif self.rule == "match":
             self.spider = MatchSpider()   #创建一个match_spider的爬虫实例
         elif self.rule == "xpath":
-            self.spider = XpathSpider2()   #创建一个xpath_spider的爬虫实例
+            self.spider = XpathSpider()   #创建一个xpath_spider的爬虫实例
 
         if self.spider:
             self.crawler.crawl(self.spider)
