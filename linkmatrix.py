@@ -399,7 +399,7 @@ class LinkMatrix():
             lines = []
             for k,v in self.forwardlinks.items():
                 if len(v) > 1:
-                    lines.append(e+'\n')
+                    lines.append(k+'\n')
                     for r in v.keys():
                         lines.append("\t"+r+'\n')
                     lines.append('\n')
@@ -529,152 +529,128 @@ class LinkMatrix():
             if e.errno != 17:
                 raise
 
-        domain_count = self.domain_links_count() #从统计函数中提取数据,作为本函数的基础数据
-        site_count = self.site_links_count()
-        page_count = self.page_links_count()
-        site_fromto_count = self.site_count_fromto()
-        domain_fromto_count = self.domain_count_fromto()
+        all_domain_count = self.all_domain_links_count() #从统计函数中提取数据,作为本函数的基础数据
+        all_site_count = self.all_site_links_count()
+        all_page_count = self.all_page_links_count()
+        all_site_fromto_count = self.all_site_count_fromto()
+        all_domain_fromto_count = self.all_domain_count_fromto()
 
-        #生成domain links counts.csv,即基于限制域的各类链接统计(所有下载条目均属于这些域)
-        with open(self.projectname+"/domain links counts.csv", "wb") as f:
-            fields = ["Domain ", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
+        #生成all domain links counts.csv,即基于限制域的各类链接统计(所有爬取条目均属于这些域)
+        with open(self.projectname+"/all domain links counts.csv", "wb") as f:
+            fields = ["Domain ", "Pages", "KnownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in site_count.items():
+            for k,v in all_site_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 #print(row)
                 writer.writerow(row)
                 
-        #生成site links counts.csv,即基于初始url对应站点的各类链接统计(部分下载条目可能不属于这些站点)
-        with open(self.projectname+"/site links counts.csv", "wb") as f:
-            fields = ["Site", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
+        #生成all site links counts.csv,即基于初始url对应站点的各类链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
+        with open(self.projectname+"/all site links counts.csv", "wb") as f:
+            fields = ["Site", "Pages", "KnownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in site_count.items():
+            for k,v in all_site_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 #print(row)
                 writer.writerow(row)
 
-        #生成page links counts.csv,即基于下载条目对应站点的各类链接统计
-        with open(self.projectname+"/page links counts.csv", "wb") as f:
-            fields = ["Page", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
+        #生成all page links counts.csv,即基于下载条目对应站点的各类链接统计
+        with open(self.projectname+"/all page links counts.csv", "wb") as f:
+            fields = ["Page", "KnownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in page_count.items():
+            for k,v in all_page_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 #print(row)
                 writer.writerow(row)
                 
-        #生成domain counts from-to.csv,即基于限制域的链接统计(所有下载条目均属于这些域)
-        with open(self.projectname+"/domain counts from-to.csv", "wb") as f:
+        #生成all domain counts from-to.csv,即基于限制域的链接统计(所有爬取条目均属于这些域)
+        with open(self.projectname+"/all domain counts from-to.csv", "wb") as f:
             fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in domain_fromto_count.items():
+            for k,v in all_domain_fromto_count.items():
                 for e,c in v.items():
                     row = {fields[0]:k, fields[1]:e, fields[2]:c}
                     #print(row)
                     writer.writerow(row)
                     
-        #生成site counts from-to.csv,即基于初始url对应站点的链接统计(部分下载条目可能不属于这些站点)
-        with open(self.projectname+"/site counts from-to.csv", "wb") as f:
+        #生成all site counts from-to.csv,即基于初始url对应站点的链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
+        with open(self.projectname+"/all site counts from-to.csv", "wb") as f:
             fields = ["From", "To", "Links"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in site_fromto_count.items():
+            for k,v in all_site_fromto_count.items():
                 for e,c in v.items():
                     row = {fields[0]:k, fields[1]:e, fields[2]:c}
                     #print(row)
                     writer.writerow(row)
 
-        #生成domain matrix.csv,即基于限制域的链接统计矩阵(所有下载条目均属于这些域)
-        with open(self.projectname+"/domain matrix.csv", "wb") as f:
+        #生成all domain matrix.csv,即基于限制域的链接统计矩阵(所有爬取条目均属于这些域)
+        with open(self.projectname+"/all domain matrix.csv", "wb") as f:
             fields =["Domain"] + [e for e in self.allowed_domain]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k in fields[1:]:
                 row = {"Domain":k}
                 [row.setdefault(e, 0) for e in fields[1:]]
-                for e,c in domain_fromto_count[k].items():
+                for e,c in all_domain_fromto_count[k].items():
                     if e in fields:
                         row[e] = c
                 #print(row)
                 writer.writerow(row)
 
-        #生成site matrix.csv,即基于初始url对应站点的链接统计矩阵(部分下载条目可能不属于这些站点)
-        with open(self.projectname+"/site matrix.csv", "wb") as f:
+        #生成all site matrix.csv,即基于初始url对应站点的链接统计矩阵(部分爬取条目可能不属于这些站点,但在限制域内)
+        with open(self.projectname+"/all site matrix.csv", "wb") as f:
             fields =["Site"] + [e for e in self.root_site]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k in fields[1:]:
                 row = {"Site":k}
                 [row.setdefault(e, 0) for e in fields[1:]]
-                for e,c in site_fromto_count[k].items():
+                for e,c in all_site_fromto_count[k].items():
                     if e in fields:
                         row[e] = c
                 #print(row)
                 writer.writerow(row)
 
-        #生成page matrix.csv,即基于下载条目的链接统计矩阵
-        with open(self.projectname+"/page matrix.csv", "wb") as f:
-            fields = ["Page"] + self.forwardlinks.keys()
+        #生成all page matrix.csv,即基于爬取条目的链接统计矩阵
+        with open(self.projectname+"/all page matrix.csv", "wb") as f:
+            fields = ["Page"] + self.entire_struct.keys()
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             rows = []
-            for k,v in self.forwardlinks.items():
+            for k,v in self.entire_struct.items():
                 row = {"Page":k}
-                [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
+                [row.setdefault(i, 0) for i in self.entire_struct.keys()]
                 for e,n in v.items():
                     row[e] = n
                 rows.append(row)
             writer.writerows(rows)
 
-        #生成page matrix strip.csv,即基于下载条目的链接统计矩阵(去除全零行)
-        with open(self.projectname+"/page matrix strip.csv", "wb") as f:
-            fields = ["Page"] + self.forwardlinks.keys()
+        #生成all page matrix strip.csv,即基于爬取条目的链接统计矩阵(去除全零行)
+        with open(self.projectname+"/all page matrix strip.csv", "wb") as f:
+            fields = ["Page"] + self.entire_struct.keys()
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             rows = []
-            for k,v in self.forwardlinks.items():
+            for k,v in self.entire_struct.items():
                 if len(v) >= 1:
                     row = {"Page":k}
-                    [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
+                    [row.setdefault(i, 0) for i in self.entire_struct.keys()]
                     for e,n in v.items():
                         row[e] = n
                     rows.append(row)
             writer.writerows(rows)
 
-        #生成link_struct.txt,即基于下载条目的链接列表(包括下载范围内外的链接,即全部链接)
-        with open(self.projectname+"/link_struct.txt", "w") as f:
+        #生成all_link_struct.txt,即基于爬取条目的链接列表(包括下载范围内外的链接,即爬取范围的全部链接)
+        with open(self.projectname+"/all_link_struct.txt", "w") as f:
             lines = []
-            for k,v in self.forwardlinks.items():
-                if len(v) > 1 or len(self.outlinks[k]) > 1:
-                    lines.append(k+'\n')
-                    for r in v.keys():
-                        lines.append("\t"+r+'\n')
-                    for r in self.outlinks[k]:
-                        lines.append("\t"+r+'\n')
-                    lines.append('\n')
-            f.writelines(lines)
-
-        #生成inlink_struct.txt,即基于下载条目的链接列表(包括下载范围内的链接)
-        with open(self.projectname+"/inlink_struct.txt", "w") as f:
-            lines = []
-            for k,v in self.forwardlinks.items():
-                if len(v) > 1:
-                    lines.append(e+'\n')
-                    for r in v.keys():
-                        lines.append("\t"+r+'\n')
-                    lines.append('\n')
-            f.writelines(lines)
-
-        #生成outlink_struct.txt,即基于下载条目的链接列表(包括下载范围外的链接)
-        with open(self.projectname+"/outlink_struct.txt", "w") as f:
-            lines = []
-            for k,v in self.outlinks.items():
+            for k,v in self.entire_struct.items():
                 if len(v) > 1:
                     lines.append(k+'\n')
                     for r in v:
@@ -682,9 +658,34 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
+        #生成all_inlink_struct.txt,即基于爬取条目的链接列表(包括下载范围内的链接)
+        with open(self.projectname+"/all_inlink_struct.txt", "w") as f:
+            lines = []
+            for k,v in self.entire_struct.items():
+                if len(v) > 1:
+                    lines.append(k+'\n')
+                    for r in v:
+                        if r in self.forwardlinks.keys():
+                            lines.append("\t"+r+'\n')
+                    lines.append('\n')
+            f.writelines(lines)
+
+        #生成all_outlink_struct.txt,即基于爬取条目的链接列表(包括下载范围外的链接)
+        with open(self.projectname+"/all_outlink_struct.txt", "w") as f:
+            lines = []
+            for k,v in self.entire_struct.items():
+                if len(v) > 1:
+                    lines.append(k+'\n')
+                    for r in v:
+                        if r not in self.forwardlinks.keys():
+                            lines.append("\t"+r+'\n')
+                    lines.append('\n')
+            f.writelines(lines)
+
 
 if __name__ == "__main__":
     lm = LinkMatrix("wlv")
     lm.load()
-    lm.export_matrix()
+    lm.export_downloadeditem_matrix()
+    lm.export_allitem_matrix()
 
