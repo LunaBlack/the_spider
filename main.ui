@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>985</width>
-    <height>652</height>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1012,27 +1012,100 @@ Xpath表达式</string>
     <addaction name="separator"/>
     <addaction name="aboutsoftwareaction"/>
    </widget>
-   <widget class="QMenu" name="analysemenu">
+   <widget class="QMenu" name="analyse1menu">
+    <property name="title">
+     <string>基于抓取条目的分析</string>
+    </property>
+    <widget class="QMenu" name="menu_1">
+     <property name="title">
+      <string>基于抓取条目的链接列表</string>
+     </property>
+     <addaction name="action11"/>
+     <addaction name="action12"/>
+     <addaction name="action13"/>
+    </widget>
+    <widget class="QMenu" name="menu_2">
+     <property name="title">
+      <string>基于起始url对应站点的链接统计</string>
+     </property>
+     <addaction name="action21"/>
+     <addaction name="action22"/>
+     <addaction name="action23"/>
+    </widget>
+    <widget class="QMenu" name="menu_3">
+     <property name="title">
+      <string>基于限定域的链接统计</string>
+     </property>
+     <addaction name="action31"/>
+     <addaction name="action32"/>
+     <addaction name="action33"/>
+    </widget>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>基于抓取页面的链接统计</string>
+     </property>
+     <addaction name="action41"/>
+     <addaction name="action42"/>
+     <addaction name="action43"/>
+    </widget>
+    <addaction name="action01"/>
+    <addaction name="menu_1"/>
+    <addaction name="menu_2"/>
+    <addaction name="menu_3"/>
+    <addaction name="menu_4"/>
+   </widget>
+   <widget class="QMenu" name="analyse2menu">
+    <property name="title">
+     <string>基于爬取页面的分析</string>
+    </property>
+    <widget class="QMenu" name="menu_5">
+     <property name="title">
+      <string>基于爬取条目的链接列表</string>
+     </property>
+     <addaction name="action51"/>
+     <addaction name="action52"/>
+     <addaction name="action53"/>
+    </widget>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>基于起始url对应站点的链接统计</string>
+     </property>
+     <addaction name="action61"/>
+     <addaction name="action62"/>
+     <addaction name="action63"/>
+    </widget>
+    <widget class="QMenu" name="menu_7">
+     <property name="title">
+      <string>基于限定域的链接统计</string>
+     </property>
+     <addaction name="action71"/>
+     <addaction name="action72"/>
+     <addaction name="action73"/>
+    </widget>
+    <widget class="QMenu" name="menu_8">
+     <property name="title">
+      <string>基于爬取页面的链接统计</string>
+     </property>
+     <addaction name="action81"/>
+     <addaction name="action82"/>
+     <addaction name="action83"/>
+    </widget>
+    <addaction name="action02"/>
+    <addaction name="menu_5"/>
+    <addaction name="menu_6"/>
+    <addaction name="menu_7"/>
+    <addaction name="menu_8"/>
+   </widget>
+   <widget class="QMenu" name="outputmenu">
     <property name="title">
      <string>分析</string>
     </property>
-    <addaction name="buildoutputaction"/>
-    <addaction name="separator"/>
-    <addaction name="action1"/>
-    <addaction name="action2"/>
-    <addaction name="action3"/>
-    <addaction name="action4"/>
-    <addaction name="separator"/>
-    <addaction name="action5"/>
-    <addaction name="action6"/>
-    <addaction name="action7"/>
-    <addaction name="separator"/>
-    <addaction name="action8"/>
-    <addaction name="action9"/>
-    <addaction name="action10"/>
+    <addaction name="outputaction"/>
    </widget>
    <addaction name="filemenu"/>
-   <addaction name="analysemenu"/>
+   <addaction name="outputmenu"/>
+   <addaction name="analyse1menu"/>
+   <addaction name="analyse2menu"/>
    <addaction name="helpmenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -1076,7 +1149,7 @@ Xpath表达式</string>
     <string>统计域名网站信息</string>
    </property>
   </action>
-  <action name="buildoutputaction">
+  <action name="buildoutput1action">
    <property name="text">
     <string>生成统计结果</string>
    </property>
@@ -1111,7 +1184,7 @@ Xpath表达式</string>
     <string>开始项目</string>
    </property>
   </action>
-  <action name="action1">
+  <action name="action01">
    <property name="text">
     <string>运行结果</string>
    </property>
@@ -1156,14 +1229,164 @@ Xpath表达式</string>
     <string>页面间链接统计矩阵</string>
    </property>
   </action>
-  <action name="action10">
-   <property name="text">
-    <string>页面间链接统计矩阵(去除全零行)</string>
-   </property>
-  </action>
   <action name="action_14">
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>各条目链接</string>
+   </property>
+  </action>
+  <action name="action1_2">
+   <property name="text">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="action2_2">
+   <property name="text">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="action3_2">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action11">
+   <property name="text">
+    <string>所有链接的列表</string>
+   </property>
+  </action>
+  <action name="action12">
+   <property name="text">
+    <string>抓取范围内链接列表</string>
+   </property>
+  </action>
+  <action name="action13">
+   <property name="text">
+    <string>抓取范围外链接列表</string>
+   </property>
+  </action>
+  <action name="action21">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action22">
+   <property name="text">
+    <string>互链统计</string>
+   </property>
+  </action>
+  <action name="action23">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action31">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action32">
+   <property name="text">
+    <string>互链统计</string>
+   </property>
+  </action>
+  <action name="action33">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action41">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action42">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action43">
+   <property name="text">
+    <string>互链统计矩阵(去除全零行)</string>
+   </property>
+  </action>
+  <action name="buildoutput2action">
+   <property name="text">
+    <string>生成统计结果</string>
+   </property>
+  </action>
+  <action name="action02">
+   <property name="text">
+    <string>运行结果</string>
+   </property>
+  </action>
+  <action name="action51">
+   <property name="text">
+    <string>所有链接的列表</string>
+   </property>
+  </action>
+  <action name="action52">
+   <property name="text">
+    <string>抓取范围内链接列表</string>
+   </property>
+  </action>
+  <action name="action53">
+   <property name="text">
+    <string>抓取范围外链接列表</string>
+   </property>
+  </action>
+  <action name="action61">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action62">
+   <property name="text">
+    <string>互链统计</string>
+   </property>
+  </action>
+  <action name="action63">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action71">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action72">
+   <property name="text">
+    <string>互链统计</string>
+   </property>
+  </action>
+  <action name="action73">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action81">
+   <property name="text">
+    <string>各类链接统计</string>
+   </property>
+  </action>
+  <action name="action82">
+   <property name="text">
+    <string>互链统计矩阵</string>
+   </property>
+  </action>
+  <action name="action83">
+   <property name="text">
+    <string>互链统计矩阵(去除全零行)</string>
+   </property>
+  </action>
+  <action name="outputaction">
+   <property name="text">
+    <string>生成统计结果</string>
    </property>
   </action>
  </widget>

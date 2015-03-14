@@ -1,6 +1,10 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
+
+#!/usr/bin/python2
+# -*- coding: utf-8 -*-
+
 import sys, os
 import time, logging
 from multiprocessing import Process, Pipe
@@ -40,12 +44,15 @@ class mycrawl(QtGui.QMainWindow):
         self.item_scraped_count = '0'
         self.downloaditem_count = '0'
 
+        self.name = "im"
+
     def updateOutput(self): #将结果信息显示在界面
-        self.runningtime += self.running and 0.5 or 0
+        self.runningtime += self.running and 0.5 or 0 #若self.running为True,则加0.5;否则不加
         hour = int(self.runningtime)//3600
         minute = int(self.runningtime - hour*3600) // 60
         second = int(self.runningtime) % 60
         self.runtimeLabel.setText("{0:02}:{1:02}:{2:02}".format(hour, minute, second))
+        #相当于 "%02d:%02d:%02d" % (hour, minute, second),其中02d指把整数扩展成两位,不足的用0填充
 
         s = list()
         stoped = None
@@ -71,8 +78,8 @@ class mycrawl(QtGui.QMainWindow):
             elif "downloader/response_status_count/200:" in a:
                 self.response_200_count = a[76:].strip()
                 self.response200countLabel.setText(self.response_200_count) #改变成功响应页面数(200)
-            elif "item_scraped_count:" in a:
-                self.item_scraped_count = a[58:].strip()
+            elif "scrapeditem:" in a:
+                self.item_scraped_count = a[26:].strip()
                 self.itemscrapedLabel.setText(self.item_scraped_count) #改变抓取条目数
             elif "downloaditem :" in a:
                 self.downloaditem_count = a[27:].strip()
@@ -84,8 +91,8 @@ class mycrawl(QtGui.QMainWindow):
                 stoped = True
                 self.spiderProcess.terminate()
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
-                self.statusLabel.setText(u"已完成") #改变运行状态Label
-                QtGui.QMessageBox.about(self, u"已完成", u"爬虫已完成")
+                self.statusLabel.setText(u"已结束") #改变运行状态Label
+                QtGui.QMessageBox.about(self, u"已结束", u"爬虫已结束")
 
         if stoped:
             #self.timer.singleShot(500, self.updateOutput) #500毫秒执行一次
@@ -160,7 +167,7 @@ class mycrawl(QtGui.QMainWindow):
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,该选项\n为必选项,\n一行一项")
         self.rule = "xpath"
 
-    def check_ready(self):
+    def check_ready(self): #检查是否所有参数都已设置好
         if self.projectnameLabel.text() == u"（未创建）": #判断是否创建了项目
             QtGui.QMessageBox.about(self, u"未创建项目", u"请新建一个项目，点击文件菜单新建项目")
             return False
@@ -178,7 +185,7 @@ class mycrawl(QtGui.QMainWindow):
         else:
             return True
 
-    def write_setting(self):
+    def write_setting(self): #将参数写入setting文本
         with open("setting.txt", 'w') as f:
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
             f.write("\n\ninitial url: \n" + self.urltextBrowser.toPlainText())
@@ -231,21 +238,33 @@ class mycrawl(QtGui.QMainWindow):
             self.timer.start(500)
 
     @QtCore.pyqtSlot()
-    def on_pauseButton_clicked(self):
+    def on_startprojectaction_triggered(self): #通过菜单开始爬取
+        self.on_startButton_clicked()
+
+    @QtCore.pyqtSlot()
+    def on_pauseButton_clicked(self): #暂停或者继续
         if self.running:
             self.running = not self.running
-            self.pauseButton.setText(u"恢复")
+            self.pauseButton.setText(u"恢复") #改变按钮文字
             self.statusLabel.setText(u"暂停") #改变运行状态Label
             self.ctrl_conn[0].send('pause crawl')
         else:
             self.running = not self.running
-            self.pauseButton.setText(u"暂停")
+            self.pauseButton.setText(u"暂停") #改变按钮文字
             self.statusLabel.setText(u"正在运行") #改变运行状态Label
             self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
-    def on_stopButton_clicked(self):
+    def on_pauseprojectaction_triggered(self): #通过菜单暂停爬取
+        self.on_pauseButton_clicked()
+
+    @QtCore.pyqtSlot()
+    def on_stopButton_clicked(self): #停止爬取
         self.ctrl_conn[0].send('stop crawl')
+
+    @QtCore.pyqtSlot()
+    def on_stopprojectaction_triggered(self): #通过菜单停止爬取
+        self.on_stopButton_clicked()
 
     @QtCore.pyqtSlot()
     def closeEvent(self, event): #关闭界面,确保spider进程退出
@@ -257,61 +276,37 @@ class mycrawl(QtGui.QMainWindow):
                 self.spiderProcess.terminate()
                 time.sleep(3)
                 if self.spiderProcess.is_alive():
-                    print("===========================send signal 9==================================")
-                    self.spiderProcess.send_signal(9)
+                    print(" ===========================send signal 9==================================")
+                    self.spiderProcess.send_signal(9) #强制结束进程
         except AttributeError:
             pass
 
-    def write_final_stats(self):
-        with open(unicode("wlv", 'utf8')+'/final stats.txt', 'w') as f:
+    @QtCore.pyqtSlot()
+    def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
+        self.close() #自动触发self.closeEvent()函数
+
+    def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
+        with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
             lines = []
-            lines.append("downloader/request_count: {0}\n".format(self.request_count) )
-            lines.append("downloader/response_count: {0}\n".format(self.response_count) )
-            lines.append("downloader/response_bytes: {0}\n".format(self.response_bytes) )
-            lines.append("downloader/response_status_count/200: {0}\n".format(self.response_200_count) )
-            lines.append("item_scraped_count: {0}\n".format(self.item_scraped_count) )
-            lines.append("downloaditem : {0}\n".format(self.downloaditem_count) )
+            lines.append(u"运行时间 : {0}\n".format(self.runtimeLabel.text()) )
+            lines.append(u"请求页面数 : {0}\n".format(self.request_count) )
+            lines.append(u"响应页面数 : {0}\n".format(self.response_count) )
+            lines.append(u"响应字节数 : {0}\n".format(self.response_bytes) )
+            lines.append(u"响应成功页面数(200) : {0}\n".format(self.response_200_count) )
+            lines.append(u"抓取条目数 : {0}\n".format(self.item_scraped_count) )
+            lines.append(u"成功下载条目数 : {0}\n".format(self.downloaditem_count) )
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
-    def on_startprojectaction_triggered(self): #通过菜单开始爬取
-        self.on_startButton_clicked()
-
-    @QtCore.pyqtSlot()
-    def on_pauseprojectaction_triggered(self): #通过菜单暂停爬取
-        self.on_pauseButton_clicked()
-
-    @QtCore.pyqtSlot()
-    def on_stopprojectaction_triggered(self): #通过菜单停止爬取
-        self.on_stopButton_clicked()
-
-    @QtCore.pyqtSlot()
-    def on_exitsoftwareaction_triggered(self): #通过菜单退出软件
-        self.close()
-
-    @QtCore.pyqtSlot()
-    def on_buildoutputaction_triggered(self):
-        lm = LinkMatrix("wlv")
-        lm.load()
+    def on_outputaction_triggered(self): #生成统计结果
+        lm = LinkMatrix("im")
+        lm.load() #读取以数据流形式写入的文件
         #lm.export_matrix(self.projectnameLabel.text())
-        lm.export_matrix()
-        self.write_final_stats()
-        QtGui.QMessageBox.about(self, u"已保存", u"已保存")
+        lm.export_downloadeditem_matrix() #生成基于抓取条目的统计结果
+        lm.export_allitem_matrix() #生成基于爬取页面的统计结果
+        self.write_final_stats() #生成结果文件,显示爬取结果的各项数据
+        QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
 
-    @QtCore.pyqtSlot()
-    def on_action1_triggered(self): #打开"运行结果"文件
-        f = self.name + "final stats.txt"
-        f_path = os.path.abspath(f_path)
-        if os.path.exists(f_path):
-            try:
-                if platform.system() == 'Windows':
-                    win32api.ShellExecute(0, 'open', 'notepad.exe', f_path, '', 1)
-                elif platform.system() == 'Linux':
-                    os.system('xdg-open {0}'.format(f_path))
-            except:
-                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
-        else:
-            QtGui.QMessageBox.about(self, u"文件不存在", u"文件不存在")
 
     def opentxtfile(self, f_path): #打开txt格式文件
         if os.path.exists(f_path):
@@ -326,23 +321,53 @@ class mycrawl(QtGui.QMainWindow):
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
 
     @QtCore.pyqtSlot()
-    def on_action2_triggered(self): #打开"各页面链接"文件
+    def on_action01_triggered(self): #打开"运行结果(downloaded)"文件
+        f = self.name + "final stats.txt"
+        f_path = os.path.abspath(f)
+        self.opentxtfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action11_triggered(self): #打开"各页面链接(downloaded)"文件
         f = self.name + "link_struct.txt"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action3_triggered(self): #打开"各页面抓取范围内链接"文件
+    def on_action12_triggered(self): #打开"各页面抓取范围内链接(downloaded)"文件
         f = self.name + "inlink_struct.txt"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action4_triggered(self): #打开"各页面抓取范围外链接"文件
+    def on_action13_triggered(self): #打开"各页面抓取范围外链接(downloaded)"文件
         f = self.name + "outlink_struct.txt"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
+    @QtCore.pyqtSlot()
+    def on_action02_triggered(self): #打开"运行结果(all)"文件
+        f = self.name + "final stats.txt"
+        f_path = os.path.abspath(f)
+        self.opentxtfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action51_triggered(self): #打开"各页面链接(all)"文件
+        f = self.name + "all_link_struct.txt"
+        f_path = os.path.abspath(f)
+        self.opentxtfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action52_triggered(self): #打开"各页面抓取范围内链接(all)"文件
+        f = self.name + "all_inlink_struct.txt"
+        f_path = os.path.abspath(f)
+        self.opentxtfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action53_triggered(self): #打开"各页面抓取范围外链接(all)"文件
+        f = self.name + "all_outlink_struct.txt"
+        f_path = os.path.abspath(f)
+        self.opentxtfile(f_path)
+        
     def opencsvfile(self, f_path): #打开csv格式文件
         if os.path.exists(f_path):
             try:
@@ -355,42 +380,112 @@ class mycrawl(QtGui.QMainWindow):
             QtGui.QMessageBox.about(self, u"请先生成统计结果", u"请先生成统计结果,点击分析菜单完成")
 
     @QtCore.pyqtSlot()
-    def on_action5_triggered(self): #打开"站点的各类链接统计"文件
+    def on_action21_triggered(self): #打开"站点的各类链接统计(downloaded)"文件
         f = self.name + "site links counts.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action6_triggered(self): #打开"站点间链接统计"文件
+    def on_action22_triggered(self): #打开"站点间的链接统计(downloaded)"文件
         f = self.name + "site counts from-to.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action7_triggered(self): #打开"站点间链接统计矩阵"文件
+    def on_action23_triggered(self): #打开"站点间的链接统计矩阵(downloaded)"文件
         f = self.name + "site matrix.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action8_triggered(self): #打开"页面的各类链接统计"文件
+    def on_action31_triggered(self): #打开"限定域的各类链接统计(downloaded)"文件
+        f = self.name + "site links counts.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action32_triggered(self): #打开"限定域间的链接统计(downloaded)"文件
+        f = self.name + "site counts from-to.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action33_triggered(self): #打开"限定域间的链接统计矩阵(downloaded)"文件
+        f = self.name + "site matrix.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+    @QtCore.pyqtSlot()
+    def on_action41_triggered(self): #打开"页面的各类链接统计(downloaded)"文件
         f = self.name + "page links counts.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action9_triggered(self): #打开"页面间链接统计矩阵"文件
+    def on_action42_triggered(self): #打开"页面间的链接统计矩阵(downloaded)"文件
         f = self.name + "page matrix.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action10_triggered(self): #打开"页面间链接统计矩阵(去除全零行)"文件
+    def on_action43_triggered(self): #打开"页面间的链接统计矩阵(去除全零行)(downloaded)"文件
         f = self.name + "page matrix strip.csv"
-        f_path = os.path.abspath(f_path)
+        f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
+    @QtCore.pyqtSlot()
+    def on_action21_triggered(self): #打开"站点的各类链接统计(all)"文件
+        f = self.name + "all site links counts.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
 
+    @QtCore.pyqtSlot()
+    def on_action22_triggered(self): #打开"站点间的链接统计(all)"文件
+        f = self.name + "all site counts from-to.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action23_triggered(self): #打开"站点间的链接统计矩阵(all)"文件
+        f = self.name + "all site matrix.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action31_triggered(self): #打开"限定域的各类链接统计(all)"文件
+        f = self.name + "all site links counts.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action32_triggered(self): #打开"限定域间的链接统计(all)"文件
+        f = self.name + "all site counts from-to.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action33_triggered(self): #打开"限定域间的链接统计矩阵(all)"文件
+        f = self.name + "all site matrix.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+    @QtCore.pyqtSlot()
+    def on_action41_triggered(self): #打开"页面的各类链接统计(all)"文件
+        f = self.name + "all page links counts.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action42_triggered(self): #打开"页面间的链接统计矩阵(all)"文件
+        f = self.name + "all page matrix.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action43_triggered(self): #打开"页面间的链接统计矩阵(去除全零行)(all)"文件
+        f = self.name + "all page matrix strip.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+        
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
     main_conn.send("start crawl")
@@ -409,4 +504,3 @@ if __name__ == "__main__":
 
     sys.exit()
     print("exit")
-

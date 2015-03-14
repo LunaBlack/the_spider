@@ -10,7 +10,6 @@ from scrapy.utils.project import get_project_settings
 from myproject.spiders.auto_spider import AutoSpider #此三行导入项目中spider目录下可用的spider类
 from myproject.spiders.match_spider import MatchSpider
 from myproject.spiders.xpath_spider import XpathSpider
-#from myproject.spiders.xpathspider2 import XpathSpider2
 
 from GlobalLogging import GlobalLogging
 
@@ -30,7 +29,7 @@ class setupspider():
 
         self.spider = None
 
-        GlobalLogging.getInstance().setLoggingToHanlder(self.getLog)
+        GlobalLogging.getInstance().setLoggingToHanlder(self.getLog) #初始化GlobalLogging的设置
         GlobalLogging.getInstance().setLoggingLevel(logging.INFO)
 
 
