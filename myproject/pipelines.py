@@ -99,7 +99,6 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
 
         if isinstance(item, PassItem): #若页面是PassItem
             spider.linkmatrix.addentirelink(item['url'], item['referer'])
-            spider.linkmatrix.addoutlink(item['url'], item['referer'])
             raise DropItem("PassItem: %s" % item['url'])
 
         elif isinstance(item, CrawledItem): #若页面是CrawledItem

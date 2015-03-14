@@ -19,11 +19,14 @@ class LinkMatrix():
 
         rs = ReadSetting()
         self.allowed_domains = rs.readalloweddomain()
-
+        
         self.entire_struct = dict() #保存网站所有的页面结构,referer、url在爬取范围(限制域)内,不一定符合抓取下载规则
         self.forwardlinks = dict() #保存所有抓取下载范围内的页面的结构,referer、url符合抓取下载规则
         self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外
 
+        self.forwardlinks_0 = dict() #保存所有抓取下载范围内的页面的结构,referer不一定符合抓取下载规则,url符合抓取下载规则
+        self.outlinks_0 = dict() #记录所有的外链,referer不一定符合抓取下载规则,url在抓取下载范围外
+        
 
     def setroot(self, root): #将初始url加入到三个字典对象中,并初始化root_site对象
         self.roots = root

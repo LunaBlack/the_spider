@@ -14,12 +14,13 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动分析获
     name = "autospider"
     number = 0
 
-    def __init__(self):
+    def __init__(self): #读取setting文件内的各项参数
         rs = ReadSetting()
         self.start_urls = rs.readurl()
-        self.linkmatrix = LinkMatrix()
+        self.linkmatrix = LinkMatrix(rs.projectname())
         self.linkmatrix.setroot(self.start_urls)
 
+        self.allowed_domains = rs.readalloweddomain()
         self.rules = [Rule(LinkExtractor(), follow=True, callback="parse_auto")]
         ##scrapy.log("start autospider!")
 
@@ -27,6 +28,8 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动分析获
 
 
     def parse_auto(self, response):
+        response.selector.remove_namespaces()
+        
         myitem = CrawledItem()
         myitem['url'] = response.url
         myitem['referer'] = response.request.headers['Referer']
