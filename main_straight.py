@@ -357,13 +357,13 @@ class mycrawl(QtGui.QMainWindow):
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action52_triggered(self): #打开"各页面抓取范围内链接(all)"文件
+    def on_action52_triggered(self): #打开"各页面爬取范围内链接(all)"文件
         f = self.name + "all_inlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action53_triggered(self): #打开"各页面抓取范围外链接(all)"文件
+    def on_action53_triggered(self): #打开"各页面爬取范围外链接(all)"文件
         f = self.name + "all_outlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)

@@ -22,10 +22,10 @@ class LinkMatrix():
         
         self.entire_struct = dict() #保存网站所有的页面结构,referer、url在爬取范围(限制域)内,不一定符合抓取下载规则
         self.forwardlinks = dict() #保存所有抓取下载范围内的页面的结构,referer、url符合抓取下载规则
-        self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外
+        self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外(包括爬取范围外的页面)
 
         self.forwardlinks_0 = dict() #保存所有抓取下载范围内的页面的结构,referer不一定符合抓取下载规则,url符合抓取下载规则
-        self.outlinks_0 = dict() #记录所有的外链,referer不一定符合抓取下载规则,url在抓取下载范围外
+        self.outlinks_0 = dict() #记录所有的外链,referer不一定符合抓取下载规则(但在爬取范围内),url在爬取范围(限制域)外
         
 
     def setroot(self, root): #将初始url加入到三个字典对象中,并初始化root_site对象
@@ -34,8 +34,8 @@ class LinkMatrix():
             if e.endswith('/'): #将url统一为不以'/'结尾的形式
                 e = e[:-1]
             self.entire_struct.setdefault(e, set())
-            self.forwardlinks.setdefault(e, dict())
-            self.outlinks.setdefault(e, set())
+            self.forwardlinks_0.setdefault(e, dict())
+            self.outlinks_0.setdefault(e, set())
 
         self.root_site = [urlparse(url).hostname for url in self.roots]
 
@@ -62,47 +62,62 @@ class LinkMatrix():
             pprint.pprint(self.entire_struct)
             return False
 
-    def addforwardlink(self, url, referer): #构建forwardlinks字典对象
+    def addforwardlink(self, url, referer): #构建forwardlinks_0字典对象
         if referer.endswith('/'):
             referer = referer[:-1]
         if url.endswith('/'):
             url = url[:-1]
             
         try:
-            if self.forwardlinks[referer].setdefault(url, 0):
-                self.forwardlinks[referer][url] += 1
+            if self.forwardlinks_0[referer].setdefault(url, 0):
+                self.forwardlinks_0[referer][url] += 1
                 return True
             else:
-                self.forwardlinks[referer][url] += 1
-                self.forwardlinks.setdefault(url, dict())
+                self.forwardlinks_0[referer][url] += 1
+                self.forwardlinks_0.setdefault(url, dict())
                 return False
         except KeyError:
             print(url, referer)
-            pprint.pprint(self.forwardlinks)
+            pprint.pprint(self.forwardlinks_0)
             return False
 
-    def addoutlink(self, url, referer): #构建outlinks字典对象
+    def addoutlink(self, url, referer): #构建outlinks_0字典对象
         if referer.endswith('/'):
             referer = referer[:-1]
         if url.endswith('/'):
             url = url[:-1]
 
         try:
-            if referer in self.outlinks.keys():
-                self.outlinks[referer].add(url)
+            if referer in self.outlinks_0.keys():
+                self.outlinks_0[referer].add(url)
                 return True
             else:
-                self.outlinks.setdefault(referer, set())
-                self.outlinks[referer].add(url)
-                self.outlinks.setdefault(url, set())
+                self.outlinks_0.setdefault(referer, set())
+                self.outlinks_0[referer].add(url)
+                self.outlinks_0.setdefault(url, set())
                 return False
         except KeyError:
             print(url, referer)
-            pprint.pprint(self.outlinks)
+            pprint.pprint(self.outlinks_0)
             return False
-        
 
-    def store(self): #以数据流形式将三个字典对象写入文件
+    def structure_forwardlinks(self): #构建forwardlinks字典对象
+        for k in self.indexmap.keys():
+            self.forwardlinks.setdefault(k, dict())
+            if k in self.forwardlinks_0.keys():
+                self.forwardlinks[k] = self.forwardlinks_0[k]
+        
+    def structure_outlinks(self): #构建outlinks字典对象
+        for k in self.indexmap.keys():
+            self.outlinks.setdefault(k, dict())
+            for t in self.entire_struct[k]:
+                if t not in self.indexmap.keys():
+                    self.outlinks[k] = t
+            if k in self.outlinks_0.keys():
+                for e in self.outlinks_0[k]:
+                    self.outlinks[k].add(e)
+                
+    def store(self): #以数据流形式将字典对象写入文件
         try:
             print("Store", self.projectname)
             os.makedirs(self.projectname) #创建以项目名命名的文件夹
@@ -119,16 +134,16 @@ class LinkMatrix():
                 writer.writerow(row)
 
         with open(self.projectname+"/linkgraph", "wb") as f: #生成基本数据存储文件(包含范围数据和三个字典对象)
-            pickle.dump((self.roots, self.root_site, self.allowed_domains, self.entire_struct, 
-                self.entire_struct, self.forwardlinks, self.outlinks), f)
+            pickle.dump((self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
+                self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks), f)
 
         print("dumped")
 
-    def load(self): #以数据流形式从文件中读取三个字典对象
+    def load(self): #以数据流形式从文件中读取字典对象
         try:
             with open(self.projectname+"/linkgraph", "r") as f:
                 self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
-                    self.entire_struct, self.forwardlinks, self.outlinks = pickle.load(f)
+                    self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks = pickle.load(f)
 
             with open(self.projectname+"/page index.csv", "r") as f:
                 self.indexmap = {}
@@ -152,58 +167,87 @@ class LinkMatrix():
     def domain_links_count(self): #基于限制域的各类链接统计(所有下载条目均属于这些域)
         count = {}
         for domain in self.allowed_domains:
-            count.setdefault(domain, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #Pages指属于该域的页面数
-            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
-            #InterLinks指条目对应的域内的页面;OutLinks指条目对应的域外的页面(包括下载范围外的页面)
+            count.setdefault(domain, {'Pages_1':0, 'Page_2':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #Pages_1指属于该域的页面数(爬取范围内);Pages_2指属于该域的页面数(下载范围内)
+            #KnownLinks链接指向下载范围内的页面;UnknownLinks链接指向下载范围外(包括爬取范围外)的页面
+            #InterLinks链接指向条目对应的域内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的域外的页面(包括下载范围外、爬取范围外的页面)
+
+        for k in self.entire_struct.keys():
+            for domain in self.allowed_domains:
+                if domain in k:
+                    from_domain = domain
+                    count[from_domain]['Pages_1'] += 1
+                    break
+            if k in self.indexmap.keys():
+                for t in self.entire_struct[k]:
+                    for domain in self.allowed_domains:
+                        if domain in t:
+                            to_domain = domain
+                            if to_domain == from_domain:
+                                count[from_domain]['InterLinks'] += 1
+                            else:
+                                count[from_domain]['OutLinks'] += 1
+                            break
 
         for k,v in self.forwardlinks.items():
             for domain in self.allowed_domains:
                 if domain in k:
                     from_domain = domain
-                    count[from_domain]['Pages'] += 1
+                    count[from_domain]['Pages_2'] += 1
                     break
-            for t in v.keys():
-                for domain in self.allowed_domains:
-                    if domain in t:
-                        to_domain = domain
-                        if to_domain == from_domain:
-                            count[from_domain]['InterLinks'] += 1
-                        else:
-                            count[from_domain]['OutLinks'] += 1
-                        break
-                count[from_domain]['KnownLinks'] += 1
+            count[from_domain]['KnownLinks'] += len(v)
 
         for k,v in self.outlinks.items():
             for domain in self.allowed_domains:
                 if domain in k:
                     from_domain = domain
                     break
-            count[from_domain]['OutLinks'] += len(v)
             count[from_domain]['UnknownLinks'] += len(v)
-
+            
+        for k,v in self.outlinks_0.items():
+            if k in self.indexmap.keys():
+                for domain in self.allowed_domains:
+                    if domain in k:
+                        from_domain = domain
+                        break
+                count[from_domain]['OutLinks'] += len(v)
+            
         return count
 
     def site_links_count(self): #基于初始url对应站点的各类链接统计(部分下载条目可能不属于这些站点)
         count = {}
         for site in self.root_site:
-            count.setdefault(site, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #Pages指站点包含的页面数
-            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
-            #InterLinks指本站点内的页面;OutLinks指本站点外的页面(包括下载范围外的页面)
+            count.setdefault(site, {'Pages_1':0, 'Pages_2':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #Pages_1指站点包含的页面数(爬取范围内);Pages_2指站点包含的页面数(下载范围内)
+            #KnownLinks链接指向下载范围内的页面;UnknownLinks链接指向下载范围外的页面(包括爬取范围外)
+            #InterLinks链接指向本站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向本站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
 
+        for k in self.entire_struct.keys():
+            try:
+                from_host = urlparse(k).hostname
+                if from_host in self.root_site:
+                    count[from_host]['Pages_1'] += 1
+                    if k in self.indexmap.keys():
+                        for t in self.entire_struct[k]:
+                            try:
+                                to_host = urlparse(t).hostname
+                            except KeyError as err:
+                                print(err)
+                                count[from_host]['OutLinks'] += 1
+                            else:
+                                if to_host == from_host:
+                                    count[from_host]['InterLinks'] += 1
+                                else:
+                                    count[from_host]['OutLinks'] += 1
+            except KeyError as err:
+                print(err)
+                
         for k,v in self.forwardlinks.items():
             try:
                 from_host = urlparse(k).hostname
                 if from_host in self.root_site:
-                    count[from_host]['Pages'] += 1
-                    for t in v.keys():
-                        to_host = urlparse(t).hostname
-                        if to_host == from_host:
-                            count[from_host]['InterLinks'] += 1
-                        else:
-                            count[from_host]['OutLinks'] += 1
-                        count[from_host]['KnownLinks'] += 1
+                    count[from_host]['Pages_2'] += 1
+                    count[from_host]['KnownLinks'] += len(v)
             except KeyError as err:
                 print(err)
 
@@ -211,11 +255,19 @@ class LinkMatrix():
             try:
                 from_host = urlparse(k).hostname
                 if from_host in self.root_site:
-                    count[from_host]['OutLinks'] += len(v)
                     count[from_host]['UnknownLinks'] += len(v)
             except KeyError as err:
                 print(err)
 
+        for k,v in self.outlinks_0.items():
+            if k in self.indexmap.keys():
+                try:
+                    from_host = urlparse(k).hostname
+                    if from_host in self.root_site:
+                        count[from_host]['OutLinks'] += len(v)
+                except KeyError as err:
+                    print(err)
+                
         return count
 
     def page_links_count(self): #基于下载条目的各类链接统计
@@ -223,20 +275,26 @@ class LinkMatrix():
         for k,v in self.forwardlinks.items():
             from_host = urlparse(k).hostname
             count.setdefault(k, {'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #KnownLinks指下载范围内的页面;UnknownLinks指下载范围外的页面
-            #InterLinks指条目对应的站点内的页面;OutLinks指条目对应的站点外的页面(包括下载范围外的页面)
+            #KnownLinks链接指向下载范围内的页面;UnknownLinks链接指向下载范围外的页面(包括爬取范围外)
+            #InterLinks链接指向条目对应的站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
+            count[k]['KnownLinks'] += len(v)
 
-            for t in v.keys():
-                to_host = urlparse(t).hostname
-                if to_host == from_host:
-                    count[k]['InterLinks'] += 1
-                else:
-                    count[k]['OutLinks'] += 1
-                count[k]['KnownLinks'] += 1
+        for k in self.entire_struct.keys():
+            if k in self.indexmap.keys():
+                from_host = urlparse(k).hostname
+                for t in self.entire_struct[k]:
+                    to_host = urlparse(t).hostname
+                    if to_host == from_host:
+                        count[k]['InterLinks'] += 1
+                    else:
+                        count[k]['OutLinks'] += 1                    
 
         for k,v in self.outlinks.items():
-            count[k]['OutLinks'] += len(v)
             count[k]['UnknownLinks'] += len(v)
+
+        for k,v in self.outlinks_0.items():
+            if k in self.indexmap.keys():
+                count[k]['OutLinks'] += len(v)
 
         return count
 
@@ -291,7 +349,7 @@ class LinkMatrix():
 
         #生成domain links counts.csv,即基于限制域的各类链接统计(所有下载条目均属于这些域)
         with open(self.projectname+"/domain links counts.csv", "wb") as f:
-            fields = ["Domain ", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
+            fields = ["Domain ", "Pages_1", "Pages_2", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in site_count.items():
@@ -302,7 +360,7 @@ class LinkMatrix():
                 
         #生成site links counts.csv,即基于初始url对应站点的各类链接统计(部分下载条目可能不属于这些站点)
         with open(self.projectname+"/site links counts.csv", "wb") as f:
-            fields = ["Site", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
+            fields = ["Site", "Pages_1", "Pages_2", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in site_count.items():
@@ -401,7 +459,7 @@ class LinkMatrix():
                     rows.append(row)
             writer.writerows(rows)
 
-        #生成link_struct.txt,即基于下载条目的链接列表(包括下载范围内外的链接,即全部链接)
+        #生成link_struct.txt,即基于下载条目的链接列表(包括爬取范围内外的链接,即全部链接)
         with open(self.projectname+"/link_struct.txt", "w") as f:
             lines = []
             for k,v in self.forwardlinks.items():
@@ -425,7 +483,7 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        #生成outlink_struct.txt,即基于下载条目的链接列表(包括下载范围外的链接)
+        #生成outlink_struct.txt,即基于下载条目的链接列表(包括下载范围外(含爬取范围外)的链接)
         with open(self.projectname+"/outlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.outlinks.items():
@@ -439,10 +497,10 @@ class LinkMatrix():
     def all_domain_links_count(self): #基于限制域的各类链接统计(所有爬取条目均属于这些域)
         count = {}
         for domain in self.allowed_domains:
-            count.setdefault(domain, {'Pages':0, 'KnownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #Pages指属于该域的页面数
-            #KnownLinks指爬取范围(限制域)内的页面
-            #InterLinks指条目对应的域内的页面;OutLinks指条目对应的域外的页面
+            count.setdefault(domain, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #Pages指属于该域的页面数(爬取范围)
+            #KnownLinks链接指向爬取范围(限制域)内的页面;UnknownLinks链接指向爬取范围(限制域)外的页面
+            #InterLinks链接指向条目对应的域内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的域外的页面(包括下载范围外、爬取范围外的页面)
 
         for k,v in self.entire_struct.items():
             for domain in self.allowed_domains:
@@ -461,15 +519,23 @@ class LinkMatrix():
                         break
                 count[from_domain]['KnownLinks'] += 1
 
+        for k,v in self.outlinks_0.items():
+            for domain in self.allowed_domains:
+                if domain in k:
+                    from_domain = domain
+                    break
+            count[from_domain]['OutLinks'] += len(v)
+            count[from_domain]['UnknownLinks'] += len(v)
+            
         return count
 
     def all_site_links_count(self): #基于初始url对应站点的各类链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
         count = {}
         for site in self.root_site:
             count.setdefault(site, {'Pages':0, 'KnownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #Pages指站点包含的页面数
-            #KnownLinks指爬取范围内的页面
-            #InterLinks指本站点内的页面;OutLinks指本站点外的页面(包括下载范围外的页面,但在限制域内)
+            #Pages指站点包含的页面数(爬取范围)
+            #KnownLinks链接指向爬取范围(限制域)内的页面;UnknownLinks链接指向爬取范围(限制域)外的页面
+            #InterLinks链接指向本站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向本站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
 
         for k,v in self.entire_struct.items():
             try:
@@ -486,15 +552,24 @@ class LinkMatrix():
             except KeyError as err:
                 print(err)
 
+        for k,v in self.outlinks_0.items():
+            try:
+                from_host = urlparse(k).hostname
+                if from_host in self.root_site:
+                    count[from_host]['OutLinks'] += len(v)
+                    count[from_host]['UnknownLinks'] += len(v)
+            except KeyError as err:
+                print(err)
+                
         return count
 
     def all_page_links_count(self): #基于爬取条目的各类链接统计(所有爬取条目均属于限制域)
         count = {}
         for k,v in self.entire_struct.items():
             from_host = urlparse(k).hostname
-            count.setdefault(k, {'KnownLinks':0, 'InterLinks':0, 'OutLinks':0})
-            #KnownLinks指爬取范围内的页面
-            #InterLinks指条目对应的站点内的页面;OutLinks指条目对应的站点外的页面(包括下载范围外的页面,但在限制域内)
+            count.setdefault(k, {'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            #KnownLinks链接指向爬取范围(限制域)内的页面;UnknownLinks链接指向爬取范围(限制域)外的页面
+            #InterLinks链接指向条目对应的站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
 
             for t in v.keys():
                 to_host = urlparse(t).hostname
@@ -503,7 +578,11 @@ class LinkMatrix():
                 else:
                     count[k]['OutLinks'] += 1
                 count[k]['KnownLinks'] += 1
-
+                
+        for k,v in self.outlinks_0.items():
+            count[k]['OutLinks'] += len(v)
+            count[k]['UnknownLinks'] += len(v)
+            
         return count
 
     def all_site_count_fromto(self): #基于初始url对应站点之间的链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
@@ -557,7 +636,7 @@ class LinkMatrix():
 
         #生成all domain links counts.csv,即基于限制域的各类链接统计(所有爬取条目均属于这些域)
         with open(self.projectname+"/all domain links counts.csv", "wb") as f:
-            fields = ["Domain ", "Pages", "KnownLinks", "InterLinks", "OutLinks"]
+            fields = ["Domain ", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in all_site_count.items():
@@ -568,7 +647,7 @@ class LinkMatrix():
                 
         #生成all site links counts.csv,即基于初始url对应站点的各类链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
         with open(self.projectname+"/all site links counts.csv", "wb") as f:
-            fields = ["Site", "Pages", "KnownLinks", "InterLinks", "OutLinks"]
+            fields = ["Site", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in all_site_count.items():
@@ -579,7 +658,7 @@ class LinkMatrix():
 
         #生成all page links counts.csv,即基于下载条目对应站点的各类链接统计
         with open(self.projectname+"/all page links counts.csv", "wb") as f:
-            fields = ["Page", "KnownLinks", "InterLinks", "OutLinks"]
+            fields = ["Page", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k,v in all_page_count.items():
@@ -667,8 +746,21 @@ class LinkMatrix():
                     rows.append(row)
             writer.writerows(rows)
 
-        #生成all_link_struct.txt,即基于爬取条目的链接列表(包括下载范围内外的链接,即爬取范围的全部链接)
+        #生成all_link_struct.txt,即基于爬取条目的链接列表(包括爬取范围内外的链接,即全部链接)
         with open(self.projectname+"/all_link_struct.txt", "w") as f:
+            lines = []
+            for k,v in self.entire_struct.items():
+                if len(v) > 1 or ( k in self.outlinks_0.keys()):
+                    lines.append(k+'\n')
+                    for r in v:
+                        lines.append("\t"+r+'\n')
+                    for r in self.outlinks_0[k]:
+                        lines.append("\t"+r+'\n')
+                    lines.append('\n')
+            f.writelines(lines)
+
+        #生成all_inlink_struct.txt,即基于爬取条目的链接列表(包括爬取范围内的链接)
+        with open(self.projectname+"/all_inlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.entire_struct.items():
                 if len(v) > 1:
@@ -678,27 +770,14 @@ class LinkMatrix():
                     lines.append('\n')
             f.writelines(lines)
 
-        #生成all_inlink_struct.txt,即基于爬取条目的链接列表(包括下载范围内的链接)
-        with open(self.projectname+"/all_inlink_struct.txt", "w") as f:
-            lines = []
-            for k,v in self.entire_struct.items():
-                if len(v) > 1:
-                    lines.append(k+'\n')
-                    for r in v:
-                        if r in self.forwardlinks.keys():
-                            lines.append("\t"+r+'\n')
-                    lines.append('\n')
-            f.writelines(lines)
-
-        #生成all_outlink_struct.txt,即基于爬取条目的链接列表(包括下载范围外的链接)
+        #生成all_outlink_struct.txt,即基于爬取条目的链接列表(包括爬取范围外的链接)
         with open(self.projectname+"/all_outlink_struct.txt", "w") as f:
             lines = []
-            for k,v in self.entire_struct.items():
+            for k,v in self.outlinks_0.items():
                 if len(v) > 1:
                     lines.append(k+'\n')
                     for r in v:
-                        if r not in self.forwardlinks.keys():
-                            lines.append("\t"+r+'\n')
+                        lines.append("\t"+r+'\n')
                     lines.append('\n')
             f.writelines(lines)
 
