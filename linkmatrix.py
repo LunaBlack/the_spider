@@ -28,6 +28,8 @@ class LinkMatrix():
     def setroot(self, root): #将初始url加入到三个字典对象中,并初始化root_site对象
         self.roots = root
         for e in self.roots:
+            if e.endswith('/'): #将url统一为不以'/'结尾的形式
+                e = e[:-1]
             self.entire_struct.setdefault(e, set())
             self.forwardlinks.setdefault(e, dict())
             self.outlinks.setdefault(e, set())
@@ -38,6 +40,11 @@ class LinkMatrix():
         self.indexmap = index
 
     def addentirelink(self, url, referer): #构建entire_struct字典对象
+        if referer.endswith('/'):
+            referer = referer[:-1]
+        if url.endswith('/'):
+            url = url[:-1]
+            
         try:
             if referer in self.entire_struct.keys():
                 self.entire_struct[referer].add(url)
@@ -53,6 +60,11 @@ class LinkMatrix():
             return False
 
     def addforwardlink(self, url, referer): #构建forwardlinks字典对象
+        if referer.endswith('/'):
+            referer = referer[:-1]
+        if url.endswith('/'):
+            url = url[:-1]
+            
         try:
             if self.forwardlinks[referer].setdefault(url, 0):
                 self.forwardlinks[referer][url] += 1
@@ -67,6 +79,11 @@ class LinkMatrix():
             return False
 
     def addoutlink(self, url, referer): #构建outlinks字典对象
+        if referer.endswith('/'):
+            referer = referer[:-1]
+        if url.endswith('/'):
+            url = url[:-1]
+
         try:
             if referer in self.outlinks.keys():
                 self.outlinks[referer].add(url)
