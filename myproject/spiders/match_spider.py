@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import re
 
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
+from scrapy.http import TextResponse
 from scrapy.log import INFO
 from scrapy.log import ERROR
 
-from myproject.items import CrawledItem
+from myproject.items import CrawledItem, PassItem
 from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
@@ -21,34 +23,37 @@ class MatchSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
         self.linkmatrix = LinkMatrix(rs.projectname())
         self.linkmatrix.setroot(self.start_urls)
 
-        domains = rs.readdomain()
-        self.allowed_domains = domains[0]
+        self.allowed_domains = rs.readalloweddomain()
+        allow, deny = rs.readurlmatch()
 
-        self.rules = [Rule( LinkExtractor(allow = domains[1], deny = domains[2]),
-            follow=True, callback="parse_domain")]
+        self.regex_allow = re.compile('({0})'.format('|'.join(allow)))
+        self.regex_deny = re.compile('({0})'.format('|'.join(deny)))
+
+        self.rules = [Rule( LinkExtractor(), follow=True, callback="parse_domain")]
 
         super(MatchSpider, self).__init__()
 
-
     def parse_domain(self, response):
         self.log('receive response from {0}'.format(response.url), INFO)
-        myitem = CrawledItem()
-        myitem['url'] = response.url
-        myitem['referer'] = response.request.headers['Referer']
-        if 'redirect_urls' in response.meta:
-            self.log("redirect_urls: {0}".format(repr(response.meta['redirect_urls'])), INFO)
-        try:
-            response.selector.remove_namespaces()
-            title_exp = response.xpath("//title/text()").extract()
-            if title_exp:
-                myitem['title'] = title_exp[0].strip()
-            else:
-                myitem['title'] = ''
-            myitem['body'] = response.body
-        except AttributeError:
-            self.log("not TextResponse: {0}".format(type(response)), ERROR)
-            myitem['title'] = ''
-            myitem['body'] = response.body
-        finally:
-            return myitem
+        url = response.url
+
+        if bool(self.regex_allow.search(url)):
+            if not bool(self.regex_deny.search(url)):
+                item = CrawledItem()
+                item['url'] = response.url
+                item['referer'] = response.request.headers['Referer']
+                if isinstance(response, TextResponse):
+                    response.selector.remove_namespaces()
+                    title_exp = response.xpath("//title/text()").extract()
+                    if title_exp:
+                        item['title'] = title_exp[0].strip()
+                    else:
+                        item['title'] = ''
+                    item['body'] = response.body
+                return item
+
+        item = PassItem()
+        item['url'] = response.url
+        item['referer'] = response.request.headers['Referer']
+        return item
 

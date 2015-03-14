@@ -1,19 +1,23 @@
 
 
 project name: 
-wlv
+im
 
 initial url: 
-http://cybermetrics.wlv.ac.uk
-http://linkanalysis.wlv.ac.uk
-http://socscibot.wlv.ac.uk
+http://im.nju.edu.cn
 
 rule: 
 domain
 
-domain: 
-allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
+allowed domain:
+allowed_domains=('im.nju.edu.cn')
 
+url match: 
+allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')
+deny=('shownodir\.aspx')
+
+xpath:
+url='//ul/li//a/@href'
 
 largest number of pages: 
 1000
@@ -28,7 +32,7 @@ longest time of requesting:
 180
 
 location of saving: 
-/home/skt/darling/the_spider/html
+/home/skt/code/the_spider/html
 
 format of saving: 
 html
