@@ -61,22 +61,22 @@ class mycrawl(QtGui.QMainWindow):
         while self.state_conn[0].poll(): #查询是否接收到状态信息
             a = self.state_conn[0].recv()
             if "downloader/request_count:" in a:
-                self.request_count = a[64:].strip()
+                self.request_count = a[(a.index("downloader/request_count:") + 25):].strip()
                 self.requestcountLabel.setText(self.request_count) #改变请求页面数
             elif "downloader/response_count:" in a:
-                self.response_count = a[65:].strip()
+                self.response_count = a[(a.index("downloader/response_count:") + 26):].strip()
                 self.responsecountLabel.setText(self.response_count) #改变响应页面数
             elif "downloader/response_bytes:" in a:
-                self.response_bytes = a[65:].strip()
+                self.response_bytes = a[(a.index("downloader/response_bytes:") + 26):].strip()
                 self.responsebytesLabel.setText(self.response_bytes) #改变响应字节数
             elif "downloader/response_status_count/200:" in a:
-                self.response_200_count = a[76:].strip()
+                self.response_200_count = a[(a.index("downloader/response_status_count/200:") + 37):].strip()
                 self.response200countLabel.setText(self.response_200_count) #改变成功响应页面数(200)
             elif "scrapeditem:" in a:
-                self.item_scraped_count = a[26:].strip()
+                self.item_scraped_count = a[(a.index("scrapeditem:") + 12):].strip()
                 self.itemscrapedLabel.setText(self.item_scraped_count) #改变抓取条目数
             elif "downloaditem :" in a:
-                self.downloaditem_count = a[27:].strip()
+                self.downloaditem_count = a[(a.index("scrapeditem:") + 13):].strip()
                 self.itemdownloadLabel.setText(self.downloaditem_count) #改变成功下载条目数
 
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
