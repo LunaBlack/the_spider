@@ -60,13 +60,13 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
             path = os.path.normcase(u"{0}/{1}.{2}".format(self.location, filename, self.saveingformat))
         return path
 
-    def open_spider(self, spider): #启动spider进程时调用该函数,初始化页面计数器
+    def open_spider(self, spider): #启动spider进程时,自动调用该函数,初始化页面计数器
         print("+SavePipeline opened spider")
         self.index = 0 #记录符合下载条件的页面数
         self.page_count = dict() #符合下载条件的页面及其对应编号的字典对象
         self.success = 0 #记录成功下载的条目数
 
-    def close_spider(self, spider): #结束spider时调用该函数,传递符合下载条件的页面及其对应编号的字典对象
+    def close_spider(self, spider): #结束spider时,自动调用该函数,传递符合下载条件的页面及其对应编号的字典对象
         spider.linkmatrix.setIndexMap(self.page_count)
 
     def process_item(self, item, spider): #下载保存(抓取下载范围内的)页面
@@ -94,18 +94,23 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
 
     def __init__(self):
         print('+StatisticsPipeline')
+        rs = ReadSetting() #读取setting文件中的保存参数
+        self.number_limit1 = rs.pagenumber() #读取“最大爬取页面数”
+        self.number_limit2 = rs.itemnumber() #读取“最大抓取条目数”
+        self.number_1 = 0 #设置“爬取页面数”的计数器
+        self.number_2 = 0 #设置“抓取下载条目数”的计数器
 
-    def process_item(self, item, spider): #对爬取到的页面进行分类统计
+    def process_item(self, item, spider): #对爬取到的页面进行分类统计,其中的CrawledItem传给SavePipeline类进行下载
 
         if isinstance(item, PassItem): #若页面是PassItem
-            spider.linkmatrix.addentirelink(item['url'], item['referer'])
-            raise DropItem("PassItem: %s" % item['url'])
+            spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
+            raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
         elif isinstance(item, CrawledItem): #若页面是CrawledItem
 
-            if spider.linkmatrix.addforwardlink(item['url'], item['referer']):
+            if spider.linkmatrix.addforwardlink(item['url'], item['referer']): #若该item已记录,即重复
                 #print ("Duplicate item found: %s" % item)
                 raise DropItem("Duplicate item found: %s" % item['url'])
-            else:
+            else: #若该item未记录,即新生成的
                 return item
 
