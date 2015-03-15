@@ -45,34 +45,19 @@ class LinkMatrix():
         referer = referer.strip('/') #将链接统一为不以'/'结尾的形式
         url = url.strip('/')
 
+        self.entire_struct.setdefault(referer, set())
+        self.entire_struct[referer].add(url)
         self.entire_struct.setdefault(url, set())
-
-        if self.entire_struct.setdefault(referer, set()): #若referer为key的值内有url(不一定为本次传递的url)
-            if url in self.entire_struct[referer]: #若referer->url已记录
-                return True
-            else:
-                self.entire_struct[referer].add(url)
-                return False
-        else:
-            self.entire_struct[referer].add(url)
-            return False
 
     def addforwardlink(self, url, referer): #构建forwardlinks_0字典对象
         referer = referer.strip('/')
         url = url.strip('/')
 
-        self.forwardlinks.setdefault(url, dict())
-
-        if self.forwardlinks.setdefault(referer, dict()):
-            if url in self.forwardlinks[referer].keys():
-                self.forwardlinks[referer][url] += 1
-                return True
-            else:
-                self.forwardlinks[referer][url] = 1
-                return False
+        self.forwardlinks.setdefault(referer, dict())
+        if url in self.forwardlinks[referer].keys():
+            self.forwardlinks[referer][url] += 1
         else:
-            self.forwardlinks[referer] = {url:1}
-            return False
+            self.forwardlinks[referer][url] = 1
 
     def addoutlink(self, url, referer): #构建outlinks_0字典对象
         referer = referer.strip('/')
@@ -147,7 +132,7 @@ class LinkMatrix():
     def domain_links_count(self): #基于限制域的各类链接统计(所有下载条目均属于这些域)
         count = {}
         for domain in self.allowed_domains:
-            count.setdefault(domain, {'Pages_1':0, 'Page_2':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            count.setdefault(domain, {'Pages_1':0, 'Pages_2':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
             #Pages_1指属于该域的页面数(爬取范围内);Pages_2指属于该域的页面数(下载范围内)
             #KnownLinks链接指向下载范围内的页面;UnknownLinks链接指向下载范围外(包括爬取范围外)的页面
             #InterLinks链接指向条目对应的域内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的域外的页面(包括下载范围外、爬取范围外的页面)
@@ -420,7 +405,8 @@ class LinkMatrix():
                 row = {"Page":k}
                 [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
                 for e,n in v.items():
-                    row[e] = n
+                    if n:
+                        row[e] = 1 #存在链接即为1,不存在即为0
                 rows.append(row)
             writer.writerows(rows)
 
@@ -435,7 +421,8 @@ class LinkMatrix():
                     row = {"Page":k}
                     [row.setdefault(i, 0) for i in self.forwardlinks.keys()]
                     for e,n in v.items():
-                        row[e] = n
+                        if n:
+                            row[e] = 1 #存在链接即为1,不存在即为0
                     rows.append(row)
             writer.writerows(rows)
 
@@ -488,7 +475,7 @@ class LinkMatrix():
                     from_domain = domain
                     count[from_domain]['Pages'] += 1
                     break
-            for t in v.keys():
+            for t in v:
                 for domain in self.allowed_domains:
                     if domain in t:
                         to_domain = domain
@@ -522,7 +509,7 @@ class LinkMatrix():
                 from_host = urlparse(k).hostname
                 if from_host in self.root_site:
                     count[from_host]['Pages'] += 1
-                    for t in v.keys():
+                    for t in v:
                         to_host = urlparse(t).hostname
                         if to_host == from_host:
                             count[from_host]['InterLinks'] += 1
@@ -551,7 +538,7 @@ class LinkMatrix():
             #KnownLinks链接指向爬取范围(限制域)内的页面;UnknownLinks链接指向爬取范围(限制域)外的页面
             #InterLinks链接指向条目对应的站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向条目对应的站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
 
-            for t in v.keys():
+            for t in v:
                 to_host = urlparse(t).hostname
                 if to_host == from_host:
                     count[k]['InterLinks'] += 1
@@ -573,7 +560,7 @@ class LinkMatrix():
         for e in self.entire_struct.keys():
             from_host = urlparse(e).hostname
             if from_host in self.root_site:
-                for t in self.entire_struct[e].keys():
+                for t in self.entire_struct[e]:
                     to_host = urlparse(t).hostname
                     if to_host in self.root_site:
                         count[from_host].setdefault(to_host, 0)
@@ -591,7 +578,7 @@ class LinkMatrix():
                 if domain in e:
                     from_domain = domain
                     break
-            for t in self.entire_struct[e].keys():
+            for t in self.entire_struct[e]:
                 for domain in self.allowed_domains:
                     if domain in t:
                         to_domain = domain
@@ -706,8 +693,8 @@ class LinkMatrix():
             for k,v in self.entire_struct.items():
                 row = {"Page":k}
                 [row.setdefault(i, 0) for i in self.entire_struct.keys()]
-                for e,n in v.items():
-                    row[e] = n
+                for e in v:
+                    row[e] = 1 #存在链接即为1,不存在即为0
                 rows.append(row)
             writer.writerows(rows)
 
@@ -721,8 +708,8 @@ class LinkMatrix():
                 if len(v) >= 1:
                     row = {"Page":k}
                     [row.setdefault(i, 0) for i in self.entire_struct.keys()]
-                    for e,n in v.items():
-                        row[e] = n
+                    for e in v:
+                        row[e] = 1 #存在链接即为1,不存在即为0
                     rows.append(row)
             writer.writerows(rows)
 

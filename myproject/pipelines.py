@@ -99,6 +99,8 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
         self.itemcount_max = rs.itemnumber() #读取“最大抓取条目数”
         self.pagecount = 0 #设置“爬取页面数”的计数器
         self.itemcount = 0 #设置“抓取下载条目数”的计数器
+        self.page_seen = set() #初始化爬取页面列表
+        self.item_seen = set() #初始化抓取下载条目列表
 
     def process_item(self, item, spider): #对爬取到的页面进行分类统计,其中的CrawledItem传给SavePipeline类进行下载
 
@@ -109,7 +111,11 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.pagecount > self.pagecount_max: #若爬取页面数超过最大值
                 raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
-            if not spider.linkmatrix.addentirelink(item['url'], item['referer']): #记录到entire_struct字典对象中;若该item未记录,即不重复
+            spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
+
+            url = item['url'].strip('/')
+            if url not in self.page_seen: #判断item是否重复
+                self.page_seen.add(url)
                 self.pagecount += 1 #爬取页面数加1
 
             raise DropItem("PassItem: %s" % item['url']) #丢弃该item
@@ -121,9 +127,13 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.itemcount > self.itemcount_max: #若抓取下载条目数超过最大值
                 raise DropItem("Duplicate item found: %s" % item['url']) #丢弃该item
 
-            if not spider.linkmatrix.addforwardlink(item['url'], item['referer']): #记录到forwardlinks字典对象中;若该item未记录,即不重复
+            spider.linkmatrix.addforwardlink(item['url'], item['referer']) #记录到forwardlinks字典对象中
+
+            url = item['url'].strip('/')
+            if url not in self.item_seen: #判断item是否重复
+                self.item_seen.add(url)
                 self.itemcount += 1 #爬取下载条目数加1
                 return item
-            else: #若该item已记录,即重复
+            else:
                 raise DropItem("Duplicate item found: %s" % item['url']) #丢弃该item
 

@@ -22,6 +22,7 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动获取”
         self.linkmatrix = LinkMatrix(rs.projectname())
         self.linkmatrix.setroot(self.start_urls)
 
+        self.allowed_domains = rs.readalloweddomain()
         self.rules = [Rule( LinkExtractor(), follow=True, callback="parse_auto")]
         #设置爬取规则:follow所有url;Request通过spidermiddlewares过滤掉限定域外的url;生成的response传递给parse_auto
         #所有Request均经过spidermiddlewares

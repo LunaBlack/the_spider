@@ -1,23 +1,19 @@
 
 
 project name: 
-im
+wlv
 
 initial url: 
-http://im.nju.edu.cn
+http://cybermetrics.wlv.ac.uk
+http://linkanalysis.wlv.ac.uk
+http://socscibot.wlv.ac.uk
 
 rule: 
-domain
+auto
 
-allowed domain:
-allowed_domains=('im.nju.edu.cn')
+allowed domain: 
+allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
 
-url match: 
-allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')
-deny=('shownodir\.aspx')
-
-xpath:
-url='//ul/li//a/@href'
 
 largest number of pages: 
 1000
@@ -26,16 +22,16 @@ largest number of items:
 1000
 
 depth of crawling: 
-0
+3
 
 longest time of requesting: 
 180
 
 location of saving: 
-/home/skt/code/the_spider/html
+F:/Scrapy test/myproject/UI/wlv
 
 format of saving: 
-html
+txt
 
 naming of saving: 
-项目+顺序数字
+Html:Title
