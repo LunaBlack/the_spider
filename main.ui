@@ -1331,12 +1331,12 @@ Xpath表达式</string>
   </action>
   <action name="action52">
    <property name="text">
-    <string>抓取范围内链接列表</string>
+    <string>爬取范围内链接列表</string>
    </property>
   </action>
   <action name="action53">
    <property name="text">
-    <string>抓取范围外链接列表</string>
+    <string>爬取范围外链接列表</string>
    </property>
   </action>
   <action name="action61">
