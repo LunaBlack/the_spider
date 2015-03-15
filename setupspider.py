@@ -69,7 +69,7 @@ class setupspider():
 
 
     def run(self):
-        log.start(logfile = "scrapy_log.txt", loglevel = "DEBUG", logstdout = False)
+        log.start(logfile = "scrapy_log.txt", loglevel = "INFO", logstdout = False)
 
         if self.rule == "auto":
             self.spider = AutoSpider()   #创建一个auto_spider的爬虫实例
