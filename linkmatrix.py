@@ -78,7 +78,7 @@ class LinkMatrix():
         referer = referer.strip('/')
         url = url.strip('/')
 
-        self.outlinks.setdefault(referer, set()):
+        self.outlinks.setdefault(referer, set())
         self.outlinks[referer].add(url)
 
     def structure_forwardlinks(self): #构建forwardlinks字典对象

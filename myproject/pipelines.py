@@ -110,9 +110,9 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             if self.pagecount == self.pagecount_max:
                 GlobalLogging.getInstance().info("[stats] reach max pagecount : {0}".format(self.pagecount))
 
-            if spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
+            if not spider.linkmatrix.addentirelink(item['url'], item['referer']): #记录到entire_struct字典对象中
                 self.pagecount += 1
-                self.page_seen.add(url)
+                #self.page_seen.add(url)
 
             raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
@@ -122,9 +122,9 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             if self.itemcount == self.itemcount_max:
                 GlobalLogging.getInstance().info("[stats] reach max itemcount : {0}".format(self.itemcount))
 
-            if spider.linkmatrix.addforwardlink(item['url'], item['referer']) #若该item已记录,即重复
+            if not spider.linkmatrix.addforwardlink(item['url'], item['referer']): #若该item已记录,即重复
                 #print ("Duplicate item found: %s" % item)
-                self.item_seen.add(url)
+                #self.item_seen.add(url)
                 self.itemcount += 1
                 return item
             else: #若该item未记录,即新生成的
