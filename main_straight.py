@@ -414,6 +414,7 @@ class mycrawl(QtGui.QMainWindow):
         f = self.name + "site matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
+
     @QtCore.pyqtSlot()
     def on_action41_triggered(self): #打开"页面的各类链接统计(downloaded)"文件
         f = self.name + "page links counts.csv"

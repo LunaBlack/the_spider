@@ -95,22 +95,39 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
     def __init__(self):
         print('+StatisticsPipeline')
         rs = ReadSetting() #读取setting文件中的保存参数
-        self.number_limit1 = rs.pagenumber() #读取“最大爬取页面数”
-        self.number_limit2 = rs.itemnumber() #读取“最大抓取条目数”
-        self.number_1 = 0 #设置“爬取页面数”的计数器
-        self.number_2 = 0 #设置“抓取下载条目数”的计数器
+        self.pagecount_max = rs.pagenumber() #读取“最大爬取页面数”
+        self.itemcount_max = rs.itemnumber() #读取“最大抓取条目数”
+        self.pagecount = 0 #设置“爬取页面数”的计数器
+        self.itemcount = 0 #设置“抓取下载条目数”的计数器
+
+        self.page_seen = set()
+        self.item_seen = set()
 
     def process_item(self, item, spider): #对爬取到的页面进行分类统计,其中的CrawledItem传给SavePipeline类进行下载
 
         if isinstance(item, PassItem): #若页面是PassItem
+            url = item['url'].strip('/')
+            if self.pagecount == self.pagecount_max:
+                GlobalLogging.getInstance().info("[stats] reach max pagecount : {0}".format(self.pagecount))
             spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
+            if url not in self.page_seen:
+                self.pagecount += 1
+                self.page_seen.add(url)
+
             raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
         elif isinstance(item, CrawledItem): #若页面是CrawledItem
+            url = CrawledItem['url'].strip('/')
 
-            if spider.linkmatrix.addforwardlink(item['url'], item['referer']): #若该item已记录,即重复
+            if self.itemcount == self.itemcount_max:
+                GlobalLogging.getInstance().info("[stats] reach max itemcount : {0}".format(self.itemcount))
+            spider.linkmatrix.addforwardlink(item['url'], item['referer']) #若该item已记录,即重复
+
+            if url not in self.item_seen:
                 #print ("Duplicate item found: %s" % item)
-                raise DropItem("Duplicate item found: %s" % item['url'])
-            else: #若该item未记录,即新生成的
+                self.item_seen.add(url)
+                self.itemcount += 1
                 return item
+            else: #若该item未记录,即新生成的
+                raise DropItem("Duplicate item found: %s" % item['url'])
 
