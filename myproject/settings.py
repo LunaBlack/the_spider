@@ -25,9 +25,9 @@ DEPTH_LIMIT = rs.depth() #限制爬取深度
 
 DOWNLOAD_TIMEOUT = rs.requesttime() #下载器超时时间(单位:秒)
 
-CLOSESPIDER_PAGECOUNT = rs.pagenumber() #指定最大的抓取响应(reponses)数
+##CLOSESPIDER_PAGECOUNT = rs.pagenumber() #指定最大的抓取响应(reponses)数
 
-CLOSESPIDER_ITEMCOUNT = rs.itemnumber() #指定条目的个数
+##CLOSESPIDER_ITEMCOUNT = rs.itemnumber() #指定Item的个数
 
 
 CONCURRENT_REQUESTS = 50 #Scrapy downloader并发请求(concurrent requests)的最大值

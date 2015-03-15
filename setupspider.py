@@ -25,7 +25,7 @@ class setupspider():
         self.crawler = Crawler(self.settings)
         self.crawler.configure()
 
-        self.crawler.signals.connect(self.stop, signal = signals.spider_closed)
+        self.crawler.signals.connect(self.stop, signal = signals.spider_closed) #当spider终止时,自动调用stop函数
 
         self.spider = None
 

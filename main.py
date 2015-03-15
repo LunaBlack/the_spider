@@ -72,8 +72,8 @@ class mycrawl(QtGui.QMainWindow):
             elif "downloader/response_status_count/200:" in a:
                 self.response_200_count = a[(a.index("downloader/response_status_count/200:") + 37):].strip()
                 self.response200countLabel.setText(self.response_200_count) #改变成功响应页面数(200)
-            elif "scrapeditem:" in a:
-                self.item_scraped_count = a[(a.index("scrapeditem:") + 12):].strip()
+            elif "scrapeditem :" in a:
+                self.item_scraped_count = a[(a.index("scrapeditem :") + 13):].strip()
                 self.itemscrapedLabel.setText(self.item_scraped_count) #改变抓取条目数
             elif "downloaditem :" in a:
                 self.downloaditem_count = a[(a.index("downloaditem :") + 14):].strip()
