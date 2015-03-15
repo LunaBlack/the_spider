@@ -50,10 +50,10 @@ class MatchSpider(CrawlSpider): #当url获取规则为“域名匹配及指定�
                     else:
                         item['title'] = ''
                     item['body'] = response.body
-                return item
+                yield item
 
         item = PassItem()
         item['url'] = response.url
         item['referer'] = response.request.headers['Referer']
-        return item
+        yield item
 
