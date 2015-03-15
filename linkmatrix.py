@@ -43,10 +43,8 @@ class LinkMatrix():
         self.indexmap = index
 
     def addentirelink(self, url, referer): #构建entire_struct字典对象
-        if referer.endswith('/'):
-            referer = referer[:-1]
-        if url.endswith('/'):
-            url = url[:-1]
+        referer = referer.strip('/')
+        url = url.strip('/')
 
         if url in self.entire_struct.keys():
             return True
@@ -60,10 +58,8 @@ class LinkMatrix():
             return False
 
     def addforwardlink(self, url, referer): #构建forwardlinks_0字典对象
-        if referer.endswith('/'):
-            referer = referer[:-1]
-        if url.endswith('/'):
-            url = url[:-1]
+        referer = referer.strip('/')
+        url = url.strip('/')
 
         if url in self.forwardlinks_0.keys():
             return True
@@ -79,10 +75,8 @@ class LinkMatrix():
 
 
     def addoutlink(self, url, referer): #构建outlinks_0字典对象
-        if referer.endswith('/'):
-            referer = referer[:-1]
-        if url.endswith('/'):
-            url = url[:-1]
+        referer = referer.strip('/')
+        url = url.strip('/')
 
         self.outlinks.setdefault(referer, set()):
         self.outlinks[referer].add(url)
