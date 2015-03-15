@@ -139,7 +139,7 @@ class mycrawl(QtGui.QMainWindow):
         self.savelocationlineEdit.setText(s)
 
     @QtCore.pyqtSlot()
-    def on_autoacquireradioButton_clicked(self): #选择url获取规则为“从页面自动分析获取”
+    def on_autoacquireradioButton_clicked(self): #选择url获取规则为“从页面自动获取”
         self.logger.info("choose autospider")
         self.ruleplainTextEdit.setPlainText(u"不需要填写本编辑框")
         self.ruletextlabel.setText(u"不需要填写")

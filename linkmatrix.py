@@ -42,13 +42,13 @@ class LinkMatrix():
         self.indexmap = index
 
     def addentirelink(self, url, referer): #构建entire_struct字典对象
-        referer = referer.strip('/')
+        referer = referer.strip('/') #将链接统一为不以'/'结尾的形式
         url = url.strip('/')
 
         self.entire_struct.setdefault(url, set())
 
-        if self.entire_struct.setdefault(referer, set()):
-            if url in self.entire_struct[referer]:
+        if self.entire_struct.setdefault(referer, set()): #若referer为key的值内有url(不一定为本次传递的url)
+            if url in self.entire_struct[referer]: #若referer->url已记录
                 return True
             else:
                 self.entire_struct[referer].add(url)

@@ -100,33 +100,30 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
         self.pagecount = 0 #设置“爬取页面数”的计数器
         self.itemcount = 0 #设置“抓取下载条目数”的计数器
 
-        #self.page_seen = set()
-        #self.item_seen = set()
-
     def process_item(self, item, spider): #对爬取到的页面进行分类统计,其中的CrawledItem传给SavePipeline类进行下载
 
         if isinstance(item, PassItem): #若页面是PassItem
-            #url = item['url'].strip('/')
-            if self.pagecount == self.pagecount_max:
-                GlobalLogging.getInstance().info("[stats] reach max pagecount : {0}".format(self.pagecount))
+            if self.pagecount == self.pagecount_max: #若爬取页面数达到最大值
+                GlobalLogging.getInstance().info("[stop_pagecount] reach max pagecount : {0}".format(self.pagecount)) #发消息停止spider
+                self.pagecount += 1 #使self.pagecount > self.pagecount_max,之后不再接收新的PassItem
+            elif self.pagecount > self.pagecount_max: #若爬取页面数超过最大值
+                raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
-            if not spider.linkmatrix.addentirelink(item['url'], item['referer']): #记录到entire_struct字典对象中
-                self.pagecount += 1
-                #self.page_seen.add(url)
+            if not spider.linkmatrix.addentirelink(item['url'], item['referer']): #记录到entire_struct字典对象中;若该item未记录,即不重复
+                self.pagecount += 1 #爬取页面数加1
 
             raise DropItem("PassItem: %s" % item['url']) #丢弃该item
 
         elif isinstance(item, CrawledItem): #若页面是CrawledItem
-            #url = CrawledItem['url'].strip('/')
+            if self.itemcount == self.itemcount_max: #若抓取下载条目数达到最大值
+                GlobalLogging.getInstance().info("[stop_itemcount] reach max itemcount : {0}".format(self.itemcount)) #发消息停止spider
+                self.itemcount += 1 #使self.itemcount > self.itemcount_max,之后不再接收新的CrawledItem
+            elif self.itemcount > self.itemcount_max: #若抓取下载条目数超过最大值
+                raise DropItem("Duplicate item found: %s" % item['url']) #丢弃该item
 
-            if self.itemcount == self.itemcount_max:
-                GlobalLogging.getInstance().info("[stats] reach max itemcount : {0}".format(self.itemcount))
-
-            if not spider.linkmatrix.addforwardlink(item['url'], item['referer']): #若该item已记录,即重复
-                #print ("Duplicate item found: %s" % item)
-                #self.item_seen.add(url)
-                self.itemcount += 1
+            if not spider.linkmatrix.addforwardlink(item['url'], item['referer']): #记录到forwardlinks字典对象中;若该item未记录,即不重复
+                self.itemcount += 1 #爬取下载条目数加1
                 return item
-            else: #若该item未记录,即新生成的
-                raise DropItem("Duplicate item found: %s" % item['url'])
+            else: #若该item已记录,即重复
+                raise DropItem("Duplicate item found: %s" % item['url']) #丢弃该item
 

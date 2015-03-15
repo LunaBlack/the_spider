@@ -43,7 +43,10 @@ class setupspider():
                 self.result_conn.send(s)
             elif log_type == "stats":
                 self.stats_conn.send(s)
-                pass
+            elif log_type =="stop_pagecount":
+                self.crawler.engine.close_spider(spider, 'closespider_pagecount')
+            elif log_type =="stop_itemcount":
+                self.crawler.engine.close_spider(spider, 'closespider_itemcount')
         else:
             print(s)
 
