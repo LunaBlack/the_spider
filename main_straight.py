@@ -82,7 +82,7 @@ class mycrawl(QtGui.QMainWindow):
                 self.item_scraped_count = a[(a.index("scrapeditem:") + 12):].strip()
                 self.itemscrapedLabel.setText(self.item_scraped_count) #改变抓取条目数
             elif "downloaditem :" in a:
-                self.downloaditem_count = a[(a.index("scrapeditem:") + 13):].strip()
+                self.downloaditem_count = a[(a.index("downloaditem :") + 14):].strip()
                 self.itemdownloadLabel.setText(self.downloaditem_count) #改变成功下载条目数
 
         if self.ctrl_conn[0].poll(): #查询是否接收到控制信息
@@ -208,7 +208,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        self.rule = "xpath"
+        self.rule = "match"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
 
@@ -367,7 +367,7 @@ class mycrawl(QtGui.QMainWindow):
         f = self.name + "all_outlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
-        
+
     def opencsvfile(self, f_path): #打开csv格式文件
         if os.path.exists(f_path):
             try:
@@ -485,7 +485,7 @@ class mycrawl(QtGui.QMainWindow):
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
-        
+
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
     main_conn.send("start crawl")
