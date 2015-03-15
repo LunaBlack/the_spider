@@ -8,12 +8,12 @@
 import scrapy
 
 
-class CrawledItem(scrapy.Item): #定义抓取下载的条目
+class CrawledItem(scrapy.Item): #定义抓取下载范围内的条目
     url = scrapy.Field()
     referer = scrapy.Field()
     title = scrapy.Field()
     body = scrapy.Field()
 
-class PassItem(scrapy.Item): #定义爬取范围内(包括下载范围内外)的条目
+class PassItem(scrapy.Item): #定义爬取范围(限定域)内的条目(包括下载范围内外)
     url = scrapy.Field()
     referer = scrapy.Field()
