@@ -27,7 +27,6 @@ class LinkMatrix():
         self.forwardlinks_0 = dict() #保存所有抓取下载范围内的页面的结构,referer不一定符合抓取下载规则,url符合抓取下载规则
         self.outlinks_0 = dict() #记录所有的外链,referer不一定符合抓取下载规则(但在爬取范围内),url在爬取范围(限制域)外
 
-
     def setroot(self, root): #将初始url加入到三个字典对象中,并初始化root_site对象
         self.roots = root
         for e in self.roots:
@@ -46,33 +45,34 @@ class LinkMatrix():
         referer = referer.strip('/')
         url = url.strip('/')
 
-        if url in self.entire_struct.keys():
-            return True
-        else:
-            if self.entire_struct.setdefault(referer, set()):
-                self.entire_struct[referer].add(url)
-                self.entire_struct.setdefault(url, set())
+        self.entire_struct.setdefault(url, set())
+
+        if self.entire_struct.setdefault(referer, set()):
+            if url in self.entire_struct[referer]:
+                return True
             else:
                 self.entire_struct[referer].add(url)
-
+                return False
+        else:
+            self.entire_struct[referer].add(url)
             return False
 
     def addforwardlink(self, url, referer): #构建forwardlinks_0字典对象
         referer = referer.strip('/')
         url = url.strip('/')
 
-        if url in self.forwardlinks_0.keys():
-            return True
-        else:
-            if refer in self.forwardlinks_0.keys():
-                self.forwardlinks_0[refer].setdefault(url, 0):
-                self.forwardlinks_0[referer][url] += 1
+        self.forwardlinks.setdefault(url, dict())
+
+        if self.forwardlinks.setdefault(referer, dict()):
+            if url in self.forwardlinks[referer].keys():
+                self.forwardlinks[referer][url] += 1
+                return True
             else:
-                self.forwardlinks_0[referer] = {url: 1}
-
-            self.forwardlinks_0.setdefault(url, dict())
+                self.forwardlinks[referer][url] = 1
+                return False
+        else:
+            self.forwardlinks[referer] = {url:1}
             return False
-
 
     def addoutlink(self, url, referer): #构建outlinks_0字典对象
         referer = referer.strip('/')
