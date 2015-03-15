@@ -13,7 +13,7 @@ from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
 
-class MatchSpider(CrawlSpider): #当url获取规则为“域名匹配及指定路径”
+class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定路径”
     name = "matchspider"
 
     def __init__(self):

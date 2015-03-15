@@ -94,7 +94,7 @@ class LinkMatrix():
             else:
                 self.outlinks_0.setdefault(referer, set())
                 self.outlinks_0[referer].add(url)
-                self.outlinks_0.setdefault(url, set())
+##                self.outlinks_0.setdefault(url, set())
                 return False
         except KeyError:
             print(url, referer)
