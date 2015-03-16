@@ -56,7 +56,7 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
         path = os.path.normcase(u"{0}/{1}.{2}".format(self.location, title, self.saveingformat))
         while os.path.exists(path): #若重名,则在结尾添加"(数字)"以区分
             number += 1
-            filename = u"{0} ({0})".format(title, number)
+            filename = u"{0} ({1})".format(title, number)
             path = os.path.normcase(u"{0}/{1}.{2}".format(self.location, filename, self.saveingformat))
         return path
 
