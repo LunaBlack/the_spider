@@ -76,7 +76,7 @@ class LinkMatrix():
         for k in self.indexmap.keys():
             self.outlinks.setdefault(k, dict())
             for t in self.entire_struct[k]:
-                if t not in self.indexmap.keys():
+                if t and (t not in self.indexmap.keys()):
                     self.outlinks[k].add(t)
             if k in self.outlinks_0.keys():
                 for e in self.outlinks_0[k]:
@@ -305,7 +305,7 @@ class LinkMatrix():
         except OSError as e:
             if e.errno != 17:
                 raise
-
+        
         domain_count = self.domain_links_count() #从统计函数中提取数据,作为本函数的基础数据
         site_count = self.site_links_count()
         page_count = self.page_links_count()
@@ -750,7 +750,7 @@ class LinkMatrix():
 
 
 if __name__ == "__main__":
-    lm = LinkMatrix("wlv")
+    lm = LinkMatrix("IM")
     lm.load()
     lm.export_downloadeditem_matrix()
     lm.export_allitem_matrix()
