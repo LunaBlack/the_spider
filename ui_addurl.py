@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'addurl.ui'
 #
-# Created: Sat Dec 06 04:31:41 2014
+# Created: Mon Mar 16 05:41:47 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -181,6 +181,7 @@ class Ui_addurlDialog(object):
         self.allurllabel.setObjectName(_fromUtf8("allurllabel"))
         self.allurltextBrowser = QtGui.QTextBrowser(addurlDialog)
         self.allurltextBrowser.setGeometry(QtCore.QRect(30, 320, 721, 131))
+        self.allurltextBrowser.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.allurltextBrowser.setObjectName(_fromUtf8("allurltextBrowser"))
         self.okButton = QtGui.QPushButton(addurlDialog)
         self.okButton.setGeometry(QtCore.QRect(570, 470, 75, 23))
