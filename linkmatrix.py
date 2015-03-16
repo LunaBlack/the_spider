@@ -77,7 +77,7 @@ class LinkMatrix():
             self.outlinks.setdefault(k, dict())
             for t in self.entire_struct[k]:
                 if t not in self.indexmap.keys():
-                    self.outlinks[k] = t
+                    self.outlinks[k].add(t)
             if k in self.outlinks_0.keys():
                 for e in self.outlinks_0[k]:
                     self.outlinks[k].add(e)

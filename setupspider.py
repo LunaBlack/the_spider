@@ -44,9 +44,9 @@ class setupspider():
             elif log_type == "stats":
                 self.stats_conn.send(s)
             elif log_type =="stop_pagecount":
-                self.crawler.engine.close_spider(spider, 'closespider_pagecount')
+                self.crawler.stop()
             elif log_type =="stop_itemcount":
-                self.crawler.engine.close_spider(spider, 'closespider_itemcount')
+                self.crawler.stop()
         else:
             print(s)
 
@@ -91,8 +91,12 @@ class setupspider():
         if reactor.running:
             reactor.stop()
 
+        print "________________stop_________"
         self.spider.linkmatrix.structure_forwardlinks() #构建forwardlinks字典对象
+        print "________________forwardlinks____________"
         self.spider.linkmatrix.structure_outlinks() #构建outlinks字典对象
+        print "outlink__________________"
         self.spider.linkmatrix.store() #以数据流形式将字典对象写入文件
+        print "store______________"
         self.ctrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程
 

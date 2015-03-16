@@ -1,37 +1,34 @@
 
 
 project name: 
-wlv
+im
 
 initial url: 
-http://cybermetrics.wlv.ac.uk
-http://linkanalysis.wlv.ac.uk
-http://socscibot.wlv.ac.uk
+http://im.nju.edu.cn
 
 rule: 
 auto
 
 allowed domain: 
-allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
-
+allowed_domains=('example.com', 'im.nju.edu.cn')
 
 largest number of pages: 
-1000
+100
 
 largest number of items: 
-1000
+100
 
 depth of crawling: 
-3
+0
 
 longest time of requesting: 
 180
 
 location of saving: 
-F:/Scrapy test/myproject/UI/wlv
+C:\Users\yangzi\Desktop\im
 
 format of saving: 
-txt
+html
 
 naming of saving: 
 Html:Title
