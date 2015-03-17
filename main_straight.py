@@ -1,11 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-
-#!/usr/bin/python2
-# -*- coding: utf-8 -*-
-
-import sys, os
+import sys, os, codecs
 import time, logging
 from multiprocessing import Process, Pipe
 import platform
@@ -145,7 +141,7 @@ class mycrawl(QtGui.QMainWindow):
         self.savelocationlineEdit.setText(s)
 
     @QtCore.pyqtSlot()
-    def on_autoacquireradioButton_clicked(self): #选择url获取规则为“从页面自动分析获取”
+    def on_autoacquireradioButton_clicked(self): #选择url获取规则为“从页面自动获取”
         self.logger.info("choose autospider")
         self.ruleplainTextEdit.setPlainText(u"不需要填写本编辑框")
         self.ruletextlabel.setText(u"不需要填写")
@@ -286,7 +282,7 @@ class mycrawl(QtGui.QMainWindow):
         self.close() #自动触发self.closeEvent()函数
 
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
-        with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
+        with codecs.open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w', 'utf8') as f:
             lines = []
             lines.append(u"运行时间 : {0}\n".format(unicode(self.runtimeLabel.text().toUtf8(), 'utf8')) )
             lines.append(u"请求页面数 : {0}\n".format(self.request_count) )
@@ -295,8 +291,6 @@ class mycrawl(QtGui.QMainWindow):
             lines.append(u"响应成功页面数(200) : {0}\n".format(self.response_200_count) )
             lines.append(u"抓取条目数 : {0}\n".format(self.item_scraped_count) )
             lines.append(u"成功下载条目数 : {0}\n".format(self.downloaditem_count) )
-            for e in lines:
-                print e
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
