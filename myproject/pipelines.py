@@ -113,9 +113,6 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.pagecount > self.pagecount_max or self.itemcount >= self.itemcount_max: #若爬取页面数或抓取下载条目数超过最大值
                 raise DropItem("PassItem: %s" % item['url'])
 
-            url = item['url']
-            if 'bcat2010062966' in url and  'tcat2010060846' in url:
-                spider.log('downloaded item from {0}'.format(item['url']), INFO)
             spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
 
             url = item['url'].strip('/')
