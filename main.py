@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, codecs
 import time, logging
 from multiprocessing import Process, Pipe
 import platform
@@ -284,7 +284,7 @@ class mycrawl(QtGui.QMainWindow):
         self.close() #自动触发self.closeEvent()函数
 
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
-        with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
+        with codecs.open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w', 'utf8') as f:
             lines = []
             lines.append(u"运行时间 : {0}\n".format(unicode(self.runtimeLabel.text().toUtf8(), 'utf8')) )
             lines.append(u"请求页面数 : {0}\n".format(self.request_count) )

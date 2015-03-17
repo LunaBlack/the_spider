@@ -8,6 +8,7 @@
 
 import os, json, csv
 from scrapy.exceptions import DropItem
+from scrapy.log import INFO, DEBUG
 
 from readsetting import ReadSetting
 from GlobalLogging import GlobalLogging
@@ -72,8 +73,8 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
     def process_item(self, item, spider): #下载保存(抓取下载范围内的)页面
         try: #try部分: 报错前的程序不回滚,即前两个计数器始终执行+1; 报错后的程序不执行
             self.index += 1
-            item['url'] = item['url'].strip('/')
-            self.page_count.setdefault(item['url'], self.index)
+            #item['url'] = item['url'].strip('/')
+            self.page_count.setdefault(item['url'].strip('/'), self.index)
             GlobalLogging.getInstance().info("[stats] scrapeditem : {0}".format(self.index))
 
             with open(self.getpath(title = item['title']), "w") as downpage:
@@ -81,10 +82,9 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
 
             self.success += 1
 
+            spider.log('downloaded item from {0}'.format(item['url']), INFO)
             GlobalLogging.getInstance().info(u"[success] downloaded {0}\n         url: {1}".format(item['title'], item['url']))
             GlobalLogging.getInstance().info("[stats] downloaditem : {0}".format(self.success))
-        except KeyError:
-            GlobalLogging.getInstance().error(u"[fail] download\n         url: {0}".format(item['url']))
         except IOError as e:
             GlobalLogging.getInstance().info(u"[fail] download, {1}: {2}\n         url: {0}".format(item['url'], e.strerror, e.filename))
 
@@ -113,6 +113,9 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.pagecount > self.pagecount_max or self.itemcount >= self.itemcount_max: #若爬取页面数或抓取下载条目数超过最大值
                 raise DropItem("PassItem: %s" % item['url'])
 
+            url = item['url']
+            if 'bcat2010062966' in url and  'tcat2010060846' in url:
+                spider.log('downloaded item from {0}'.format(item['url']), INFO)
             spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
 
             url = item['url'].strip('/')
