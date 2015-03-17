@@ -39,6 +39,11 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
         self.log('receive response from {0}'.format(response.url), INFO) #记录log,收到一个Response
         url = response.url
 
+        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
+        item['url'] = response.url
+        item['referer'] = response.request.headers['Referer']
+        yield item
+        
         if bool(self.regex_allow.search(url)): #判断url是否满足allow条件
             if not bool(self.regex_deny.search(url)): #判断url是否满足deny条件
                 item = CrawledItem() #满足下载条件,则生成CrawledItem
@@ -54,8 +59,4 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
                     item['body'] = response.body
                 yield item
 
-        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
-        item['url'] = response.url
-        item['referer'] = response.request.headers['Referer']
-        yield item
 

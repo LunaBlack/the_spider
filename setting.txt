@@ -1,22 +1,22 @@
 
 
 project name: 
-IM
+im
 
 initial url: 
-http://im.nju.edu.cn
+http://www.nju.edu.cn
 
 rule: 
 auto
 
 allowed domain: 
-allowed_domains=('example.com', 'im.nju.edu.cn')
+allowed_domains=('www.nju.edu.cn', 'im.nju.edu.cn')
 
 largest number of pages: 
-100
+50
 
 largest number of items: 
-123
+100
 
 depth of crawling: 
 0
@@ -25,10 +25,10 @@ longest time of requesting:
 180
 
 location of saving: 
-C:\Users\yangzi\Desktop\im
+C:\Users\yangzi\Desktop\新建文件夹
 
 format of saving: 
-txt
+html
 
 naming of saving: 
-顺序数字
+Html:Title

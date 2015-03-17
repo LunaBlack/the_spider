@@ -286,7 +286,7 @@ class mycrawl(QtGui.QMainWindow):
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
         with open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w') as f:
             lines = []
-            lines.append(u"运行时间 : {0}\n".format(self.runtimeLabel.text()) )
+            lines.append(u"运行时间 : {0}\n".format(unicode(self.runtimeLabel.text().toUtf8(), 'utf8')) )
             lines.append(u"请求页面数 : {0}\n".format(self.request_count) )
             lines.append(u"响应页面数 : {0}\n".format(self.response_count) )
             lines.append(u"响应字节数 : {0}\n".format(self.response_bytes) )
