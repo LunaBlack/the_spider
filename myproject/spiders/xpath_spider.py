@@ -37,8 +37,16 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
         response.selector.remove_namespaces()
         self.log('receive response from {0}'.format(response.url), INFO) #记录log,收到一个Response
 
+        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
+        item['url'] = response.url
+        try:
+            item['referer'] = response.request.headers['Referer']
+        except KeyError as e:
+            pass
+        else:
+            yield item
+            
         urls = response.xpath(self.xpath).extract() #提取符合xpath规则的url
-
         base_url = get_base_url(response) #提取Response中的url,补全相对地址前面省略的部分(部分xpath中的url为相对地址)
 
         for e in urls: #判断符合xpath规则的url是否为相对地址:若是,则补全为绝对地址
@@ -50,15 +58,6 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
                 url = e
             self.log('queued a request to {0}'.format(url), INFO) #记录log,生成一个Request
             yield Request(url, callback = self.parse_xpath_item) #针对符合xpath规则的url,生成Request,得到的Response传递给parse_xpath_item
-
-        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
-        item['url'] = response.url
-        try:
-            item['referer'] = response.request.headers['Referer']
-        except KeyError as e:
-            pass
-        else:
-            yield item
 
 
     def parse_xpath_item(self, response): #针对xpath中的url(已经过spidermiddlewares过滤),生成CrawledItem

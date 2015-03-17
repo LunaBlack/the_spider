@@ -53,18 +53,18 @@ class LinkMatrix():
         referer = referer.strip('/')
         url = url.strip('/')
 
-        self.forwardlinks.setdefault(referer, dict())
-        if url in self.forwardlinks[referer].keys():
-            self.forwardlinks[referer][url] += 1
+        self.forwardlinks_0.setdefault(referer, dict())
+        if url in self.forwardlinks_0[referer].keys():
+            self.forwardlinks_0[referer][url] += 1
         else:
-            self.forwardlinks[referer][url] = 1
+            self.forwardlinks_0[referer][url] = 1
 
     def addoutlink(self, url, referer): #构建outlinks_0字典对象
         referer = referer.strip('/')
         url = url.strip('/')
 
-        self.outlinks.setdefault(referer, set())
-        self.outlinks[referer].add(url)
+        self.outlinks_0.setdefault(referer, set())
+        self.outlinks_0[referer].add(url)
 
     def structure_forwardlinks(self): #构建forwardlinks字典对象
         for k in self.indexmap.keys():
@@ -74,7 +74,7 @@ class LinkMatrix():
 
     def structure_outlinks(self): #构建outlinks字典对象
         for k in self.indexmap.keys():
-            self.outlinks.setdefault(k, dict())
+            self.outlinks.setdefault(k, set())
             for t in self.entire_struct[k]:
                 if t and (t not in self.indexmap.keys()):
                     self.outlinks[k].add(t)
@@ -369,7 +369,7 @@ class LinkMatrix():
 
         #生成domain matrix.csv,即基于限制域的链接统计矩阵(所有下载条目均属于这些域)
         with open(self.projectname+"/domain matrix.csv", "wb") as f:
-            fields =["Domain"] + [e for e in self.allowed_domain]
+            fields =["Domain"] + [e for e in self.allowed_domains]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k in fields[1:]:
@@ -487,19 +487,20 @@ class LinkMatrix():
                 count[from_domain]['KnownLinks'] += 1
 
         for k,v in self.outlinks_0.items():
-            for domain in self.allowed_domains:
-                if domain in k:
-                    from_domain = domain
-                    break
-            count[from_domain]['OutLinks'] += len(v)
-            count[from_domain]['UnknownLinks'] += len(v)
+            if k in self.entire_struct.keys():
+                for domain in self.allowed_domains:
+                    if domain in k:
+                        from_domain = domain
+                        break
+                count[from_domain]['OutLinks'] += len(v)
+                count[from_domain]['UnknownLinks'] += len(v)
 
         return count
 
     def all_site_links_count(self): #基于初始url对应站点的各类链接统计(部分爬取条目可能不属于这些站点,但在限制域内)
         count = {}
         for site in self.root_site:
-            count.setdefault(site, {'Pages':0, 'KnownLinks':0, 'InterLinks':0, 'OutLinks':0})
+            count.setdefault(site, {'Pages':0, 'KnownLinks':0, 'UnknownLinks':0, 'InterLinks':0, 'OutLinks':0})
             #Pages指站点包含的页面数(爬取范围)
             #KnownLinks链接指向爬取范围(限制域)内的页面;UnknownLinks链接指向爬取范围(限制域)外的页面
             #InterLinks链接指向本站点内的页面(包括下载范围内外,即爬取范围内);OutLinks链接指向本站点外的页面(包括爬取范围内;及爬取范围外的所有页面)
@@ -520,13 +521,14 @@ class LinkMatrix():
                 print(err)
 
         for k,v in self.outlinks_0.items():
-            try:
-                from_host = urlparse(k).hostname
-                if from_host in self.root_site:
-                    count[from_host]['OutLinks'] += len(v)
-                    count[from_host]['UnknownLinks'] += len(v)
-            except KeyError as err:
-                print(err)
+            if k in self.entire_struct.keys():
+                try:
+                    from_host = urlparse(k).hostname
+                    if from_host in self.root_site:
+                        count[from_host]['OutLinks'] += len(v)
+                        count[from_host]['UnknownLinks'] += len(v)
+                except KeyError as err:
+                    print(err)
 
         return count
 
@@ -547,8 +549,9 @@ class LinkMatrix():
                 count[k]['KnownLinks'] += 1
 
         for k,v in self.outlinks_0.items():
-            count[k]['OutLinks'] += len(v)
-            count[k]['UnknownLinks'] += len(v)
+            if k in self.entire_struct.keys():
+                count[k]['OutLinks'] += len(v)
+                count[k]['UnknownLinks'] += len(v)
 
         return count
 
@@ -658,7 +661,7 @@ class LinkMatrix():
 
         #生成all domain matrix.csv,即基于限制域的链接统计矩阵(所有爬取条目均属于这些域)
         with open(self.projectname+"/all domain matrix.csv", "wb") as f:
-            fields =["Domain"] + [e for e in self.allowed_domain]
+            fields =["Domain"] + [e for e in self.allowed_domains]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
             for k in fields[1:]:
@@ -741,7 +744,7 @@ class LinkMatrix():
         with open(self.projectname+"/all_outlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.outlinks_0.items():
-                if len(v) > 1:
+                if k in self.entire_struct.keys() and len(v) > 1:
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')
@@ -750,7 +753,7 @@ class LinkMatrix():
 
 
 if __name__ == "__main__":
-    lm = LinkMatrix("IM")
+    lm = LinkMatrix("im")
     lm.load()
     lm.export_downloadeditem_matrix()
     lm.export_allitem_matrix()

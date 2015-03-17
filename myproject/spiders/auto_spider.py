@@ -33,6 +33,11 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动获取”
         self.log('receive response from {0}'.format(response.url), INFO) #记录log,收到一个Response
         response.selector.remove_namespaces()
 
+        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
+        item['url'] = response.url
+        item['referer'] = response.request.headers['Referer']
+        yield item
+        
         item = CrawledItem() #所有传递到本函数中的Response.url,均满足抓取下载条件;即所有限定域内的url,生成一个CrawledItem
         item['url'] = response.url
         item['referer'] = response.request.headers['Referer']
@@ -51,9 +56,4 @@ class AutoSpider(CrawlSpider): #当url获取规则为“从页面自动获取”
             item['body'] = response.body
         finally:
             yield item
-
-        item = PassItem() #所有传递到本函数中的Response,生成PassItem;即所有限定域内的url,生成一个PassItem
-        item['url'] = response.url
-        item['referer'] = response.request.headers['Referer']
-        yield item
 
