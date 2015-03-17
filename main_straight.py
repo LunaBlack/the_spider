@@ -208,7 +208,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_startButton_clicked(self): #开始爬取网页
-        self.rule = "match"
+        self.rule = "auto"
 
         #self.logger.info("arguments of project have been saved in setting.txt")
 

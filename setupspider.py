@@ -90,9 +90,9 @@ class setupspider():
     def stop(self):
         if reactor.running:
             reactor.stop()
-            
-        self.spider.linkmatrix.structure_forwardlinks() #构建forwardlinks字典对象
-        self.spider.linkmatrix.structure_outlinks() #构建outlinks字典对象
+
+        #self.spider.linkmatrix.structure_forwardlinks() #构建forwardlinks字典对象
+        #self.spider.linkmatrix.structure_outlinks() #构建outlinks字典对象
         self.spider.linkmatrix.store() #以数据流形式将字典对象写入文件
         self.ctrl_conn.send("stoped crawl") #将控制信息"停止"传给主进程
 

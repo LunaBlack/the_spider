@@ -99,16 +99,20 @@ class LinkMatrix():
                 writer.writerow(row)
 
         with open(self.projectname+"/linkgraph", "wb") as f: #生成基本数据存储文件(包含范围数据和三个字典对象)
+            #pickle.dump((self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
+            #    self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks), f)
             pickle.dump((self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
-                self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks), f)
+                self.forwardlinks, self.outlinks), f)
 
         print("dumped")
 
     def load(self): #以数据流形式从文件中读取字典对象
         try:
             with open(self.projectname+"/linkgraph", "r") as f:
+                #self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
+                #    self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks = pickle.load(f)
                 self.roots, self.root_site, self.allowed_domains, self.entire_struct, \
-                    self.forwardlinks_0, self.outlinks_0, self.forwardlinks, self.outlinks = pickle.load(f)
+                    self.forwardlinks, self.outlinks = pickle.load(f)
 
             with open(self.projectname+"/page index.csv", "r") as f:
                 self.indexmap = {}
@@ -305,7 +309,7 @@ class LinkMatrix():
         except OSError as e:
             if e.errno != 17:
                 raise
-        
+
         domain_count = self.domain_links_count() #从统计函数中提取数据,作为本函数的基础数据
         site_count = self.site_links_count()
         page_count = self.page_links_count()

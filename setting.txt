@@ -25,10 +25,11 @@ longest time of requesting:
 180
 
 location of saving: 
-C:\Users\yangzi\Desktop\新建文件夹
+/home/skt/code/the_spider/html
 
 format of saving: 
 html
 
 naming of saving: 
 Html:Title
+
