@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, codecs
 import time, logging
 from multiprocessing import Process, Pipe
 import platform
