@@ -1,38 +1,34 @@
 
 
 project name: 
-list
+im
 
 initial url: 
 http://www.nju.edu.cn
 
 rule: 
-match
+auto
 
 allowed domain: 
 allowed_domains=('nju.edu.cn')
 
-url match: 
-allow=('list', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')
-deny=('1')
-
 largest number of pages: 
-1000
+10
 
 largest number of items: 
-1000
+10
 
 depth of crawling: 
-0
+3
 
 longest time of requesting: 
 180
 
 location of saving: 
-C:/Documents and Settings/luna20141225/桌面/list
+C:/Documents and Settings/luna20141225/桌面/IM
 
 format of saving: 
-html
+txt
 
 naming of saving: 
-项目+顺序数字
+顺序数字
