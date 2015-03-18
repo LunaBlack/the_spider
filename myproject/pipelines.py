@@ -113,7 +113,7 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.pagecount > self.pagecount_max or self.itemcount >= self.itemcount_max: #若爬取页面数或抓取下载条目数超过最大值
                 raise DropItem("PassItem: %s" % item['url'])
 
-            spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct字典对象中
+            spider.linkmatrix.addentirelink(item['url'], item['referer']) #记录到entire_struct_0字典对象中
 
             url = item['url'].strip('/')
             if url not in self.page_seen: #判断item是否重复
@@ -130,7 +130,7 @@ class StatisticsPipeline(object): #对爬取到的页面进行分类统计
             elif self.itemcount > self.itemcount_max or self.pagecount >= self.pagecount_max: #若抓取下载条目数或爬取页面数超过最大值
                 raise DropItem("Duplicate item found: %s" % item['url'])
 
-            spider.linkmatrix.addforwardlink(item['url'], item['referer']) #记录到forwardlinks字典对象中
+            spider.linkmatrix.addforwardlink(item['url'], item['referer']) #记录到forwardlinks_0字典对象中
 
             url = item['url'].strip('/')
             if url not in self.item_seen: #判断item是否重复

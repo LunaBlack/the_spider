@@ -46,6 +46,7 @@ STATS_CLASS = 'statscollect.SpiderStatsCollector' #设置状态收集器
 
 #JOBDIR = 'crawls/{0}'.format(BOT_NAME)
 
+DUPEFILTER_CLASS = 'myproject.duplicatefilter.RFPDupeFilter' #检测过滤重复请求的类,添加部分代码以传递链接结构
 
 ITEM_PIPELINES = {
         'myproject.pipelines.StatisticsPipeline': 300,
