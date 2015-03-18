@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# 该spider专门针对:url获取规则为“Xpath表达式”,且爬取深度设置为1
 
 
 from scrapy.contrib.spiders import CrawlSpider, Rule
@@ -15,8 +16,8 @@ from readsetting import ReadSetting
 from linkmatrix import LinkMatrix
 
 
-class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
-    name = "xpathspider"
+class XpathSpider0(CrawlSpider): #当url获取规则为“Xpath表达式”,且爬取深度设置为1
+    name = "xpathspider0"
 
     def __init__(self):
         rs = ReadSetting() #读取各项参数
@@ -26,7 +27,7 @@ class XpathSpider(CrawlSpider): #当url获取规则为“Xpath表达式”
 
         self.allowed_domains = rs.readalloweddomain()
         self.xpath = rs.readxpath()
-        self.rules = [Rule(LinkExtractor(), follow=True, callback="parse_start_url")]
+        self.rules = [Rule(LinkExtractor(), follow=False, callback="parse_start_url")]
         #设置爬取规则:follow所有url;Request通过spidermiddlewares过滤掉限定域外的url;生成的response传递给parse_start_url
         #所有Request均经过spidermiddlewares
 

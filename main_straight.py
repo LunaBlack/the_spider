@@ -186,13 +186,15 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nproject name: \n" + self.projectnameLabel.text())
             f.write("\n\ninitial url: \n" + self.urltextBrowser.toPlainText())
             f.write("\n\nrule: \n" + self.rule)
+            if self.rule == "xpath" and str(self.depthspinBox.value()) == 1: #若url获取规则为“Xpath表达式”,且深度为1,则不能通过深度减1得到正确结果
+                self.rule == "xpath0" #此时采用xpathspider0
             if not self.rangeplainTextEdit.toPlainText():
                 f.write("\n\nallowed domain: \nallowed_domains=('')")
             else:
                 f.write("\n\nallowed domain: \n" + self.rangeplainTextEdit.toPlainText())
             if self.rule == "match":
                 f.write("\n\nurl match: \n" + self.ruleplainTextEdit.toPlainText())
-            elif self.rule == "xpath":
+            elif self.rule == "xpath" or self.rule == "xpath0":
                 f.write("\n\nxpath: \n" + self.ruleplainTextEdit.toPlainText())
             f.write("\n\nlargest number of pages: \n" + str(self.pagenumberspinBox.value()))
             f.write("\n\nlargest number of items: \n" + str(self.itemnumberspinBox.value()))
@@ -256,6 +258,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self): #停止爬取
+        self.statusLabel.setText(u"正在停止") #改变运行状态Label
         self.ctrl_conn[0].send('stop crawl')
 
     @QtCore.pyqtSlot()

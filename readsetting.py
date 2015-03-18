@@ -19,6 +19,16 @@ class ReadSetting: #读取用户设置的信息,包括起始url、url获取规�
         return projectname
 
 
+    def readrule(self): #读取爬取规则(url获取规则)
+        rule = ""
+        for n,i in enumerate(self.text):
+            if i.startswith("rule:"):
+                m = n + 1
+                rule = self.text[m].strip()
+                break
+        return rule
+
+    
     def readurl(self): #读取起始url
         url = []
         for n,i in enumerate(self.text):

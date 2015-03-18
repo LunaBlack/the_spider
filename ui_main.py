@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Mon Mar 16 05:40:26 2015
+# Created: Thu Mar 19 00:30:36 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -622,7 +622,7 @@ class Ui_MainWindow(object):
         self.addurlButton.setText(_translate("MainWindow", "添加", None))
         self.emptyurlButton.setText(_translate("MainWindow", "清空", None))
         self.rangegroupBox.setTitle(_translate("MainWindow", "爬取范围", None))
-        self.rangelabel.setText(_translate("MainWindow", "<html><head/><body><p>设置爬取范围</p><p>即:设置限定域</p><p>爬取的url必须在域内</p></body></html>", None))
+        self.rangelabel.setText(_translate("MainWindow", "<html><head/><body><p>设置限定域:</p><p>爬取到的url在域内时,</p><p>才对其进行跟踪和下载</p></body></html>", None))
         self.rangeplainTextEdit.setPlainText(_translate("MainWindow", "allowed_domains=(\'example.com\', \'im.nju.edu.cn\')", None))
         self.rangetextlabel.setText(_translate("MainWindow", "按范例将引号\n"
 "中内容替换；\n"

@@ -155,7 +155,7 @@
            <item>
             <widget class="QLabel" name="rangelabel">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置爬取范围&lt;/p&gt;&lt;p&gt;即:设置限定域&lt;/p&gt;&lt;p&gt;爬取的url必须在域内&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;设置限定域:&lt;/p&gt;&lt;p&gt;爬取到的url在域内时,&lt;/p&gt;&lt;p&gt;才对其进行跟踪和下载&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>

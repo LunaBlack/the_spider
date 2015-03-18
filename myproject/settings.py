@@ -21,7 +21,10 @@ SPIDER_MODULES = ['myproject.spiders']
 NEWSPIDER_MODULE = 'myproject.spiders'
 
 
-DEPTH_LIMIT = rs.depth() #限制爬取深度
+depth = rs.depth()
+if rs.readrule() == "xpath" and depth !=0 and depth !=1:
+    depth -=1
+DEPTH_LIMIT = depth #限制爬取深度
 
 DOWNLOAD_TIMEOUT = rs.requesttime() #下载器超时时间(单位:秒)
 
