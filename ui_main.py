@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Thu Mar 19 00:30:36 2015
+# Created: Thu Mar 19 01:22:08 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -560,12 +560,15 @@ class Ui_MainWindow(object):
         self.action83.setObjectName(_fromUtf8("action83"))
         self.outputaction = QtGui.QAction(MainWindow)
         self.outputaction.setObjectName(_fromUtf8("outputaction"))
+        self.documentationaction = QtGui.QAction(MainWindow)
+        self.documentationaction.setObjectName(_fromUtf8("documentationaction"))
         self.filemenu.addAction(self.newprojectaction)
         self.filemenu.addAction(self.startprojectaction)
         self.filemenu.addAction(self.pauseactionaction)
         self.filemenu.addAction(self.stopprojectaction)
         self.filemenu.addSeparator()
         self.filemenu.addAction(self.exitsoftwareaction)
+        self.helpmenu.addAction(self.documentationaction)
         self.helpmenu.addAction(self.helpdocumentaction)
         self.helpmenu.addSeparator()
         self.helpmenu.addAction(self.aboutsoftwareaction)
@@ -745,4 +748,5 @@ class Ui_MainWindow(object):
         self.action82.setText(_translate("MainWindow", "互链统计矩阵", None))
         self.action83.setText(_translate("MainWindow", "互链统计矩阵(去除全零行)", None))
         self.outputaction.setText(_translate("MainWindow", "生成统计结果", None))
+        self.documentationaction.setText(_translate("MainWindow", "说明文档", None))
 

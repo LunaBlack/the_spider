@@ -73,7 +73,6 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
     def process_item(self, item, spider): #下载保存(抓取下载范围内的)页面
         try: #try部分: 报错前的程序不回滚,即前两个计数器始终执行+1; 报错后的程序不执行
             self.index += 1
-            #item['url'] = item['url'].strip('/')
             self.page_count.setdefault(item['url'].strip('/'), self.index)
             GlobalLogging.getInstance().info("[stats] scrapeditem : {0}".format(self.index))
 

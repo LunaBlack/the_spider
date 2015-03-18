@@ -23,7 +23,7 @@ class LinkMatrix():
         #此三个字典通过合并duplicate_struct字典,覆盖反方向的链接(即链接两端均被记载,但只记录过单方向链接)
         self.entire_struct = dict() #保存网站所有的页面结构,referer、url在爬取范围(限制域)内,不一定符合抓取下载规则
         self.forwardlinks = dict() #保存所有抓取下载范围内的页面的结构,referer、url符合抓取下载规则
-        self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外(包括爬取范围外的页面)
+        self.outlinks = dict() #记录所有的外链,referer符合抓取下载规则,url在抓取下载范围外(包括爬取范围内外的页面)
 
         self.duplicate_struct = dict() #对于重复的request,记录对应的referer->url
 

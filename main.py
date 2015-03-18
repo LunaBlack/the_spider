@@ -372,9 +372,12 @@ class mycrawl(QtGui.QMainWindow):
     def opencsvfile(self, f_path): #打开csv格式文件
         if os.path.exists(f_path):
             try:
-                excel=win32com.client.Dispatch('Excel.Application')
-                excel.Visible = 1
-                excel.Workbooks.Open(f_path)
+                if platform.system() == 'Windows':
+                    excel = win32com.client.Dispatch('Excel.Application')
+                    excel.Visible = 1
+                    excel.Workbooks.Open(f_path)
+                else:
+                    os.system('xdg-open {0}'.format(f_path))
             except:
                 QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
         else:
@@ -485,6 +488,23 @@ class mycrawl(QtGui.QMainWindow):
         f = self.name + "/all page matrix strip.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_documentationaction_triggered(self): #打开说明文档(关于生成的统计结果文件的说明)
+        f = "Documentation.doc"
+        f_path = os.path.abspath(f)
+        if os.path.exists(f_path):
+            try:
+                if platform.system() == 'Windows':
+                    word = win32com.client.Dispatch('Word.Application')
+                    word.Visible = 1
+                    word.Documents.Open(f_path)
+                else:
+                    os.system('xdg-open {0}'.format(f_path))
+            except:
+                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
+        else:
+            QtGui.QMessageBox.about(self, u"找不到文件", u"找不到文件")
 
 
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
