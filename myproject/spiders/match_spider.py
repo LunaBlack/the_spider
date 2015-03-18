@@ -26,8 +26,8 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
         self.allowed_domains = rs.readalloweddomain()
         allow, deny = rs.readurlmatch()
 
-        self.regex_allow = re.compile('({0})'.format('|'.join(re.escape(allow)))) #生成正则表达式
-        self.regex_deny = re.compile('({0})'.format('|'.join(re.escape(deny))))
+        self.regex_allow = re.compile('({0})'.format('|'.join([re.escape(e) for e in allow]))) #生成正则表达式
+        self.regex_deny = re.compile('({0})'.format('|'.join([re.escape(e) for e in deny])))
 
         self.rules = [Rule( LinkExtractor(), follow=True, callback="parse_match")]
         #设置爬取规则:follow所有url;Request通过spidermiddlewares过滤掉限定域外的url;生成的response传递给parse_match
