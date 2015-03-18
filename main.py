@@ -286,13 +286,13 @@ class mycrawl(QtGui.QMainWindow):
     def write_final_stats(self): #输出结果文件,显示爬取结果的各项数据
         with codecs.open(u'{0}/final stats.txt'.format(unicode(self.projectnameLabel.text().toUtf8(), 'utf8')), 'w', 'utf8') as f:
             lines = []
-            lines.append(u"运行时间 : {0}\n".format(unicode(self.runtimeLabel.text().toUtf8(), 'utf8')) )
-            lines.append(u"请求页面数 : {0}\n".format(self.request_count) )
-            lines.append(u"响应页面数 : {0}\n".format(self.response_count) )
-            lines.append(u"响应字节数 : {0}\n".format(self.response_bytes) )
-            lines.append(u"响应成功页面数(200) : {0}\n".format(self.response_200_count) )
-            lines.append(u"抓取条目数 : {0}\n".format(self.item_scraped_count) )
-            lines.append(u"成功下载条目数 : {0}\n".format(self.downloaditem_count) )
+            lines.append(u"运行时间 : {0}\r\n".format(unicode(self.runtimeLabel.text().toUtf8(), 'utf8')) )
+            lines.append(u"请求页面数 : {0}\r\n".format(self.request_count) )
+            lines.append(u"响应页面数 : {0}\r\n".format(self.response_count) )
+            lines.append(u"响应字节数 : {0}\r\n".format(self.response_bytes) )
+            lines.append(u"响应成功页面数(200) : {0}\r\n".format(self.response_200_count) )
+            lines.append(u"抓取条目数 : {0}\r\n".format(self.item_scraped_count) )
+            lines.append(u"成功下载条目数 : {0}\r\n".format(self.downloaditem_count) )
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
@@ -320,49 +320,49 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action01_triggered(self): #打开"运行结果(downloaded)"文件
-        f = self.name + "final stats.txt"
+        f = self.name + "/final stats.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action11_triggered(self): #打开"各页面链接(downloaded)"文件
-        f = self.name + "link_struct.txt"
+        f = self.name + "/link_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action12_triggered(self): #打开"各页面抓取范围内链接(downloaded)"文件
-        f = self.name + "inlink_struct.txt"
+        f = self.name + "/inlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action13_triggered(self): #打开"各页面抓取范围外链接(downloaded)"文件
-        f = self.name + "outlink_struct.txt"
+        f = self.name + "/outlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action02_triggered(self): #打开"运行结果(all)"文件
-        f = self.name + "final stats.txt"
+        f = self.name + "/final stats.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action51_triggered(self): #打开"各页面链接(all)"文件
-        f = self.name + "all_link_struct.txt"
+        f = self.name + "/all_link_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action52_triggered(self): #打开"各页面爬取范围内链接(all)"文件
-        f = self.name + "all_inlink_struct.txt"
+        f = self.name + "/all_inlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action53_triggered(self): #打开"各页面爬取范围外链接(all)"文件
-        f = self.name + "all_outlink_struct.txt"
+        f = self.name + "/all_outlink_struct.txt"
         f_path = os.path.abspath(f)
         self.opentxtfile(f_path)
 
@@ -379,107 +379,107 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action21_triggered(self): #打开"站点的各类链接统计(downloaded)"文件
-        f = self.name + "site links counts.csv"
+        f = self.name + "/site links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action22_triggered(self): #打开"站点间的链接统计(downloaded)"文件
-        f = self.name + "site counts from-to.csv"
+        f = self.name + "/site counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action23_triggered(self): #打开"站点间的链接统计矩阵(downloaded)"文件
-        f = self.name + "site matrix.csv"
+        f = self.name + "/site matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action31_triggered(self): #打开"限定域的各类链接统计(downloaded)"文件
-        f = self.name + "site links counts.csv"
+        f = self.name + "/site links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action32_triggered(self): #打开"限定域间的链接统计(downloaded)"文件
-        f = self.name + "site counts from-to.csv"
+        f = self.name + "/site counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action33_triggered(self): #打开"限定域间的链接统计矩阵(downloaded)"文件
-        f = self.name + "site matrix.csv"
+        f = self.name + "/site matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
     @QtCore.pyqtSlot()
     def on_action41_triggered(self): #打开"页面的各类链接统计(downloaded)"文件
-        f = self.name + "page links counts.csv"
+        f = self.name + "/page links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action42_triggered(self): #打开"页面间的链接统计矩阵(downloaded)"文件
-        f = self.name + "page matrix.csv"
+        f = self.name + "/page matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action43_triggered(self): #打开"页面间的链接统计矩阵(去除全零行)(downloaded)"文件
-        f = self.name + "page matrix strip.csv"
+        f = self.name + "/page matrix strip.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action21_triggered(self): #打开"站点的各类链接统计(all)"文件
-        f = self.name + "all site links counts.csv"
+    def on_action61_triggered(self): #打开"站点的各类链接统计(all)"文件
+        f = self.name + "/all site links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action22_triggered(self): #打开"站点间的链接统计(all)"文件
-        f = self.name + "all site counts from-to.csv"
+    def on_action62_triggered(self): #打开"站点间的链接统计(all)"文件
+        f = self.name + "/all site counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action23_triggered(self): #打开"站点间的链接统计矩阵(all)"文件
-        f = self.name + "all site matrix.csv"
+    def on_action63_triggered(self): #打开"站点间的链接统计矩阵(all)"文件
+        f = self.name + "/all site matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action31_triggered(self): #打开"限定域的各类链接统计(all)"文件
-        f = self.name + "all site links counts.csv"
+    def on_action71_triggered(self): #打开"限定域的各类链接统计(all)"文件
+        f = self.name + "/all site links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action32_triggered(self): #打开"限定域间的链接统计(all)"文件
-        f = self.name + "all site counts from-to.csv"
+    def on_action72_triggered(self): #打开"限定域间的链接统计(all)"文件
+        f = self.name + "/all site counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action33_triggered(self): #打开"限定域间的链接统计矩阵(all)"文件
-        f = self.name + "all site matrix.csv"
+    def on_action73_triggered(self): #打开"限定域间的链接统计矩阵(all)"文件
+        f = self.name + "/all site matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
     @QtCore.pyqtSlot()
-    def on_action41_triggered(self): #打开"页面的各类链接统计(all)"文件
-        f = self.name + "all page links counts.csv"
-        f_path = os.path.abspath(f)
-        self.opencsvfile(f_path)
-
-    @QtCore.pyqtSlot()
-    def on_action42_triggered(self): #打开"页面间的链接统计矩阵(all)"文件
-        f = self.name + "all page matrix.csv"
+    def on_action81_triggered(self): #打开"页面的各类链接统计(all)"文件
+        f = self.name + "/all page links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
-    def on_action43_triggered(self): #打开"页面间的链接统计矩阵(去除全零行)(all)"文件
-        f = self.name + "all page matrix strip.csv"
+    def on_action82_triggered(self): #打开"页面间的链接统计矩阵(all)"文件
+        f = self.name + "/all page matrix.csv"
+        f_path = os.path.abspath(f)
+        self.opencsvfile(f_path)
+
+    @QtCore.pyqtSlot()
+    def on_action83_triggered(self): #打开"页面间的链接统计矩阵(去除全零行)(all)"文件
+        f = self.name + "/all page matrix strip.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 

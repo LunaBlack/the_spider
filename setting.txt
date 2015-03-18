@@ -1,22 +1,26 @@
 
 
 project name: 
-im
+list
 
 initial url: 
 http://www.nju.edu.cn
 
 rule: 
-auto
+match
 
 allowed domain: 
-allowed_domains=('www.nju.edu.cn', 'im.nju.edu.cn')
+allowed_domains=('nju.edu.cn')
+
+url match: 
+allow=('list', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')
+deny=('1')
 
 largest number of pages: 
-50
+1000
 
 largest number of items: 
-100
+1000
 
 depth of crawling: 
 0
@@ -25,10 +29,10 @@ longest time of requesting:
 180
 
 location of saving: 
-C:\Users\yangzi\Desktop\新建文件夹
+C:/Documents and Settings/luna20141225/桌面/list
 
 format of saving: 
 html
 
 naming of saving: 
-Html:Title
+项目+顺序数字

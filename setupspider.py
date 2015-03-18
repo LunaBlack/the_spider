@@ -44,9 +44,9 @@ class setupspider():
             elif log_type == "stats":
                 self.stats_conn.send(s)
             elif log_type =="stop_pagecount":
-                self.crawler.stop()
+                self.crawler.engine.close_spider(spider, 'closespider_pagecount')
             elif log_type =="stop_itemcount":
-                self.crawler.stop()
+                self.crawler.engine.close_spider(spider, 'closespider_itemcount')
         else:
             print(s)
 
@@ -90,7 +90,8 @@ class setupspider():
     def stop(self):
         if reactor.running:
             reactor.stop()
-            
+
+        self.spider.linkmatrix.structure_entirelink() #构建entire_struct字典对象
         self.spider.linkmatrix.structure_forwardlinks() #构建forwardlinks字典对象
         self.spider.linkmatrix.structure_outlinks() #构建outlinks字典对象
         self.spider.linkmatrix.store() #以数据流形式将字典对象写入文件

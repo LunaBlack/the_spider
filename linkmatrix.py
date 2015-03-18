@@ -753,8 +753,9 @@ class LinkMatrix():
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')
-                    for r in self.outlinks_0[k]:
-                        lines.append("\t"+r+'\n')
+                    if k in self.outlinks_0.keys():
+                        for r in self.outlinks_0[k]:
+                            lines.append("\t"+r+'\n')
                     lines.append('\n')
             f.writelines(lines)
 
