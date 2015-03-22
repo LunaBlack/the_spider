@@ -1,37 +1,34 @@
 
 
 project name: 
-wlv
+im
 
 initial url: 
-http://cybermetrics.wlv.ac.uk
-http://linkanalysis.wlv.ac.uk
-http://socscibot.wlv.ac.uk
+http://im.nju.edu.cn
 
 rule: 
 auto
 
 allowed domain: 
-allowed_domains=('cybermetrics.wlv.ac.uk', 'linkanalysis.wlv.ac.uk', 'socscibot.wlv.ac.uk')
-
+allowed_domains=('example.com', 'im.nju.edu.cn')
 
 largest number of pages: 
-0
+1000
 
 largest number of items: 
-0
+1000
 
 depth of crawling: 
-0
+3
 
 longest time of requesting: 
 180
 
 location of saving: 
-C:/Documents and Settings/luna20141225/桌面/wlv
+C:/Documents and Settings/luna20141225/桌面/html
 
 format of saving: 
 html
 
 naming of saving: 
-Html:Title
+顺序数字

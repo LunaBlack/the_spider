@@ -1,0 +1,11 @@
+('F:\\Scrapy test\\myproject\\UI\\build\\main\\out00-PKG.pkg',
+ {'BINARY': 1,
+  'DATA': 1,
+  'EXECUTABLE': 1,
+  'EXTENSION': 1,
+  'PYMODULE': 1,
+  'PYSOURCE': 1},
+ [('out00-PYZ.pyz', 'F:\\Scrapy test\\myproject\\UI\\build\\main\\out00-PYZ.pyz', 'PYZ'), ('struct', 'E:\\Python\\Python\\lib\\struct.pyc', 'PYMODULE'), ('pyi_os_path', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\pyi_os_path.pyc', 'PYMODULE'), ('pyi_archive', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\pyi_archive.pyc', 'PYMODULE'), ('pyi_importers', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\pyi_importers.pyc', 'PYMODULE'), ('_pyi_bootstrap', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\_pyi_bootstrap.py', 'PYSOURCE'), ('pyi_carchive', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\pyi_carchive.py', 'PYSOURCE'), ('_pyi_egg_install.py', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\_pyi_egg_install.py', 'PYSOURCE'), ('pyi_rth_twisted', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\rthooks\\pyi_rth_twisted.py', 'PYSOURCE'), ('pyi_rth_qt4plugins', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\rthooks\\pyi_rth_qt4plugins.py', 'PYSOURCE'), ('pyi_rth_win32comgenpy', 'E:\\Python\\Python\\lib\\site-packages\\PyInstaller\\loader\\rthooks\\pyi_rth_win32comgenpy.py', 'PYSOURCE'), ('main', 'main.py', 'PYSOURCE'), ('main.exe.manifest', 'F:\\Scrapy test\\myproject\\UI\\build\\main\\main.exe.manifest', 'BINARY')],
+ True,
+ None,
+ False)

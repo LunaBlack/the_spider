@@ -3,7 +3,7 @@
 
 import sys, os, codecs
 import time, logging
-from multiprocessing import Process, Pipe
+from multiprocessing import Process, Pipe, freeze_support
 import platform
 if platform.system() == 'Windows':
     import win32com.client, win32api
@@ -515,6 +515,9 @@ def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spide
     the_spider.run()
 
 if __name__ == "__main__":
+    if sys.platform.startswith('win'):
+	freeze_support()
+
     print("start")
 
     app = QtGui.QApplication(sys.argv)
