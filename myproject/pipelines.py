@@ -18,7 +18,6 @@ from myproject.items import CrawledItem, PassItem
 class SavePipeline(object): #下载符合抓取下载条件的网页
 
     def __init__(self):
-        print('+SavePipeline')
         rs = ReadSetting() #读取setting文件中的保存参数
         self.savename = rs.savingname()
         self.location = rs.savinglocation()
@@ -62,7 +61,6 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
         return path
 
     def open_spider(self, spider): #启动spider进程时,自动调用该函数,初始化页面计数器
-        print("+SavePipeline opened spider")
         self.index = 0 #记录符合下载条件的页面数
         self.page_count = dict() #符合下载条件的页面及其对应编号的字典对象
         self.success = 0 #记录成功下载的条目数
@@ -93,7 +91,6 @@ class SavePipeline(object): #下载符合抓取下载条件的网页
 class StatisticsPipeline(object): #对爬取到的页面进行分类统计
 
     def __init__(self):
-        print('+StatisticsPipeline')
         rs = ReadSetting() #读取setting文件中的保存参数
         self.pagecount_max = rs.pagenumber() #读取“最大爬取页面数”
         self.itemcount_max = rs.itemnumber() #读取“最大抓取条目数”

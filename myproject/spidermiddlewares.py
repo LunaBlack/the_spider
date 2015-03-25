@@ -11,7 +11,6 @@ from scrapy import log
 class OffsiteMiddleware(object): #中间件,过滤掉爬取范围(限定域)外的链接
 
     def __init__(self, stats):
-        print("+OffsiteMiddleware")
         self.stats = stats
 
     @classmethod
@@ -49,16 +48,13 @@ class OffsiteMiddleware(object): #中间件,过滤掉爬取范围(限定域)外�
     def get_host_regex(self, spider): #返回一个匹配spider.allowed_domains中所有domain的正则表达式
         """Override this method to implement a different offsite policy"""
         allowed_domains = getattr(spider, 'allowed_domains', None) #获取spider.allowed_domains的值; 若spider未设置allowed_domains属性,则返回None
-        print(allowed_domains)
         if not allowed_domains: #若spider未设置allowed_domains属性
             return re.compile('') # allow all by default
         regex = r'^(.*\.)?(%s)$' % '|'.join(re.escape(d) for d in allowed_domains if d is not None) #生成正则表达式
         #log.msg(format="Filter regex: %(regex)s", level=log.DEBUG, regex=regex)
-        print(regex)
         return re.compile(regex)
 
     def spider_opened(self, spider): #spider开启时,自动被调用
-        print("+OffsiteMiddleware spider_opened")
         self.host_regex = self.get_host_regex(spider) #获取一个匹配spider.allowed_domains中所有domain的正则表达式
         self.domains_seen = set() #初始化已知domain
 

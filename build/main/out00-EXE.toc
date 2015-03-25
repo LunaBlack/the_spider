@@ -1,9 +1,0 @@
-('F:\\Scrapy test\\myproject\\UI\\build\\main\\main.exe',
- True,
- False,
- None,
- None,
- [],
- None,
- False,
- 1427050355L)

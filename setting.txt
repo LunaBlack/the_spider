@@ -25,10 +25,10 @@ longest time of requesting:
 180
 
 location of saving: 
-C:/Documents and Settings/luna20141225/桌面/html
+F:/html
 
 format of saving: 
 html
 
 naming of saving: 
-顺序数字
+项目+顺序数字

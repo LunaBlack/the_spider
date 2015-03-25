@@ -109,9 +109,9 @@ class LinkMatrix():
                     if t and (t not in self.indexmap.keys()):
                         self.outlinks[k].add(t)
                         
+
     def store(self): #以数据流形式将字典对象写入文件
         try:
-            print("Store", self.projectname)
             os.makedirs(self.projectname) #创建以项目名命名的文件夹
         except OSError as err:
             if err.errno != 17:
@@ -130,7 +130,6 @@ class LinkMatrix():
                          self.entire_struct_0, self.forwardlinks_0, self.outlinks_0, \
                          self.entire_struct, self.forwardlinks, self.outlinks), f)
 
-        print("dumped")
 
     def load(self): #以数据流形式从文件中读取字典对象
         try:
@@ -147,6 +146,7 @@ class LinkMatrix():
         except IOError as err:
             raise err
 
+
     def iter_dfs(self, links, root): #深度优先遍历,生成链接链(暂时无用)
         accessed, queue = set(), []
         queue.append(root)
@@ -157,6 +157,7 @@ class LinkMatrix():
             accessed.add(u)
             queue.extend(links[u].keys())
             yield u
+
 
     def domain_links_count(self): #基于限制域的各类链接统计(所有下载条目均属于这些域)
         count = {}
@@ -226,7 +227,8 @@ class LinkMatrix():
                             try:
                                 to_host = urlparse(t).hostname
                             except KeyError as err:
-                                print(err)
+                                #print(err)
+                                pass
                                 count[from_host]['OutLinks'] += 1
                             else:
                                 if to_host == from_host:
@@ -234,7 +236,8 @@ class LinkMatrix():
                                 else:
                                     count[from_host]['OutLinks'] += 1
             except KeyError as err:
-                print(err)
+                #print(err)
+                pass
 
         for k,v in self.forwardlinks.items():
             try:
@@ -243,7 +246,8 @@ class LinkMatrix():
                     count[from_host]['Pages_2'] += 1
                     count[from_host]['KnownLinks'] += len(v)
             except KeyError as err:
-                print(err)
+                #print(err)
+                pass
 
         for k,v in self.outlinks.items():
             try:
@@ -251,7 +255,8 @@ class LinkMatrix():
                 if from_host in self.root_site:
                     count[from_host]['UnknownLinks'] += len(v)
             except KeyError as err:
-                print(err)
+                #print(err)
+                pass
 
         for k,v in self.outlinks_0.items():
             if k in self.indexmap.keys():
@@ -260,7 +265,8 @@ class LinkMatrix():
                     if from_host in self.root_site:
                         count[from_host]['OutLinks'] += len(v)
                 except KeyError as err:
-                    print(err)
+                    #print(err)
+                    pass
 
         return count
 
@@ -547,7 +553,8 @@ class LinkMatrix():
                             count[from_host]['OutLinks'] += 1
                         count[from_host]['KnownLinks'] += 1
             except KeyError as err:
-                print(err)
+                #print(err)
+                pass
 
         for k,v in self.outlinks_0.items():
             if k in self.entire_struct.keys():
@@ -557,7 +564,8 @@ class LinkMatrix():
                         count[from_host]['OutLinks'] += len(v)
                         count[from_host]['UnknownLinks'] += len(v)
                 except KeyError as err:
-                    print(err)
+                    #print(err)
+                    pass
 
         return count
 

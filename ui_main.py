@@ -620,7 +620,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "爬虫软件", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Luna_spider", None))
         self.urlgroupBox.setTitle(_translate("MainWindow", "起始URL", None))
         self.addurlButton.setText(_translate("MainWindow", "添加", None))
         self.emptyurlButton.setText(_translate("MainWindow", "清空", None))

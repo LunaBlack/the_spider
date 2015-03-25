@@ -35,7 +35,6 @@ class setupspider():
 
 
     def getLog(self, s): #将结果信息传给主进程
-        #print(s)
         if s.startswith("INFO"):
             log_type = s[s.index('[')+1 : s.index(']')]
             if log_type == "success":
@@ -49,25 +48,21 @@ class setupspider():
             elif log_type =="stop_itemcount":
                 self.crawler.stop()
         else:
-            print(s)
+            pass
 
         if self.ctrl_conn.poll(): #查询是否接收到控制信息
             c = self.ctrl_conn.recv()
             if c == 'stop crawl':
-                print("=============================received stop==================================")
                 self.crawler.stop()
             elif c == 'pause crawl':
-                print("=============================received pause=================================")
                 self.crawler.engine.pause()
                 while 1:
                     if self.ctrl_conn.poll(1):
                         c = self.ctrl_conn.recv()
                         if c == 'unpause crawl':
-                            print("=============================received unpause===============================")
                             self.crawler.engine.unpause()
                             break
                         elif c == 'stop crawl':
-                            print("=============================received stop==================================")
                             self.crawler.stop()
                             break
 

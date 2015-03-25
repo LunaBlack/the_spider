@@ -275,7 +275,6 @@ class mycrawl(QtGui.QMainWindow):
                 self.spiderProcess.terminate()
                 time.sleep(3)
                 if self.spiderProcess.is_alive():
-                    print(" ===========================send signal 9==================================")
                     self.spiderProcess.send_signal(9) #强制结束进程
         except AttributeError:
             pass
@@ -300,7 +299,6 @@ class mycrawl(QtGui.QMainWindow):
     def on_outputaction_triggered(self): #生成统计结果
         lm = LinkMatrix("im")
         lm.load() #读取以数据流形式写入的文件
-        #lm.export_matrix(self.projectnameLabel.text())
         lm.export_downloadeditem_matrix() #生成基于抓取条目的统计结果
         lm.export_allitem_matrix() #生成基于爬取页面的统计结果
         self.write_final_stats() #生成结果文件,显示爬取结果的各项数据
@@ -513,7 +511,7 @@ def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spide
     the_spider.run()
 
 if __name__ == "__main__":
-    print("start")
+    #print("start")
 
     app = QtGui.QApplication(sys.argv)
     win = mycrawl()
@@ -522,4 +520,4 @@ if __name__ == "__main__":
     app.exec_()
 
     sys.exit()
-    print("exit")
+    #print("exit")
