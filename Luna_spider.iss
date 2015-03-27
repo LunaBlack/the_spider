@@ -10,7 +10,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{66ACED76-427F-445C-B18D-542A8662E207}
+AppId={{C86EC57B-AC83-462D-B129-0119F1BB16F9}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
@@ -76,6 +76,7 @@ Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\QtNetwork4.dll"; DestDi
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\QtSvg4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\QtWebKit4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\RCX72F.tmp"; DestDir: "{app}"; Flags: ignoreversion
+Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\scrapy.cfg"; DestDir: "{app}"; Flags: ignoreversion
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\scrapy_log.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\select.pyd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "F:\Scrapy test\myproject\UI\build\exe.win32-2.7\setting.txt"; DestDir: "{app}"; Flags: ignoreversion
