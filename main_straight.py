@@ -302,14 +302,32 @@ class mycrawl(QtGui.QMainWindow):
             f.writelines(lines)
 
     @QtCore.pyqtSlot()
-    def on_outputaction_triggered(self): #生成统计结果
-        lm = LinkMatrix("im")
-        lm.load() #读取以数据流形式写入的文件
-        lm.export_downloadeditem_matrix() #生成基于抓取条目的统计结果
-        lm.export_allitem_matrix() #生成基于爬取页面的统计结果
-        self.write_final_stats() #生成结果文件,显示爬取结果的各项数据
-        QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
+    def on_outputaction_triggered(self): #点击"生成统计结果"按钮
+        projectname = "im"
+        f = projectname + "/linkgraph"
+        f_path = os.path.abspath(f)
+        
+        if os.path.exists(f_path): #判断是否完成了项目的爬取工作
+            self.prompt_box = QtGui.QMessageBox(self) #生成提示框
+            self.prompt_box.setWindowTitle(u"正在生成统计结果")
+            self.prompt_box.setText(u"正在生成统计结果,请耐心等待  \n生成完毕后,会以对话框形式提醒  ")
+            self.prompt_box.show()
+            
+            self.lm_thread = MyThread(projectname) #生成子进程实例
+            self.lm_thread.sinPrompt.connect(self.lm_prompt) #信号绑定
+            self.lm_thread.start() #进入子线程函数,执行run方法
+            
+        else:
+            QtGui.QMessageBox.about(self, u"未完成爬取", u"请先完成项目的爬取工作")
 
+    def lm_prompt(self): #收到信号,已生成统计结果,弹出提示
+        #self.write_final_stats() #生成结果文件,显示爬取结果的各项数据
+        try:
+            self.prompt_box.hide()
+        except:
+            pass
+        QtGui.QMessageBox.about(self, u"已生成统计结果", u"已生成统计结果")
+        
 
     def opentxtfile(self, f_path): #打开txt格式文件
         if os.path.exists(f_path):
@@ -516,6 +534,23 @@ def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spide
     the_spider = setupspider(rule, contrl_conn, result_conn, state_conn) #实例化setupspider类
     the_spider.run()
 
+
+class MyThread(QtCore.QThread): #子线程,实现"生成统计结果"的功能
+    sinPrompt = QtCore.pyqtSignal()
+
+    def __init__(self, projectname):
+        super(MyThread, self).__init__()
+        self.projectname = projectname
+
+    def run(self): #start会自动执行线程内的run方法
+        lm = LinkMatrix(self.projectname) #生成LinkMatrix实例
+        lm.load() #读取以数据流形式写入的文件        
+        lm.export_downloadeditem_matrix() #生成基于抓取条目的统计结果
+        lm.export_allitem_matrix() #生成基于爬取页面的统计结果
+        
+        self.sinPrompt.emit() #发送信号,表明功能已实现
+
+        
 if __name__ == "__main__":
     #print("start")
 
