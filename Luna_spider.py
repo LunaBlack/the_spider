@@ -306,7 +306,7 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_outputaction_triggered(self): #点击"生成统计结果"按钮
-        projectname = self.projectnameLabel.text()
+        projectname = unicode(self.projectnameLabel.text().toUtf8(), 'utf8')
         f = projectname + "/linkgraph"
         f_path = os.path.abspath(f)
         
