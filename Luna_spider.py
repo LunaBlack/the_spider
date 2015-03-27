@@ -149,7 +149,7 @@ class mycrawl(QtGui.QMainWindow):
     def on_matchradioButton_clicked(self): #选择url获取规则为“网址匹配及路径选择”
         self.logger.info("choose matchspider")
         self.ruleplainTextEdit.setPlainText(\
-            "allow=('showstaff\.aspx', 'directory\.google\.com/[A-Z][a-zA-Z_/]+$')\ndeny=('shownodir\.aspx')")
+            "allow=('showstaff.aspx', 'showtwodir.aspx?tcategoryid=')\ndeny=('shownodir.aspx')")
         self.ruletextlabel.setText(u"按范例将引\n号中内容替\n换,两项均\n非必选项,\n一行一项")
         self.rule = "match"
 
@@ -227,6 +227,12 @@ class mycrawl(QtGui.QMainWindow):
 
         self.tabWidget.setCurrentIndex(1)
         self.statusLabel.setText(u"正在运行") #改变运行状态Label
+        self.requestcountLabel.setText("0")
+        self.responsecountLabel.setText("0")
+        self.responsebytesLabel.setText("0")
+        self.response200countLabel.setText("0")
+        self.itemscrapedLabel.setText("0")
+        self.itemdownloadLabel.setText("0")
         self.resultplainTextEdit.appendPlainText(u"-------start--------\n")
         #QtGui.QMessageBox.about(self, u"开始", u"开始爬取")
 
