@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'projectname.ui'
 #
-# Created: Mon Mar 16 05:42:17 2015
+# Created: Fri Jul 10 02:40:26 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,6 +35,9 @@ class Ui_projectnemaDialog(object):
         projectnemaDialog.setSizePolicy(sizePolicy)
         projectnemaDialog.setMinimumSize(QtCore.QSize(414, 124))
         projectnemaDialog.setMaximumSize(QtCore.QSize(414, 124))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("moon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        projectnemaDialog.setWindowIcon(icon)
         projectnemaDialog.setModal(True)
         self.projectnamelabel = QtGui.QLabel(projectnemaDialog)
         self.projectnamelabel.setGeometry(QtCore.QRect(20, 10, 301, 23))

@@ -217,11 +217,3 @@ class addurl(QtGui.QDialog):
 
 
 
-##    @QtCore.pyqtSlot()
-##    def on_allurltextBrowser_customContextMenuRequested(point):
-##        print "customContextMenu"
-##        self.menu = QtGui.QMenu(self)
-##        self.menu.addAction("Delete")
-
-
-

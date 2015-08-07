@@ -3,13 +3,16 @@
 
 import sys, os, codecs
 import time, logging
+import webbrowser
 from multiprocessing import Process, Pipe, freeze_support
+import threading
 import platform
 if platform.system() == 'Windows':
     import win32com.client, win32api
 
 from PyQt4 import QtCore, QtGui, uic
 from addurl import addurl
+from about import about
 from projectname import projectname
 from setupspider import setupspider
 
@@ -22,6 +25,9 @@ class mycrawl(QtGui.QMainWindow):
     def __init__(self):
         super(mycrawl, self).__init__()
         ui_main = uic.loadUi("main.ui", self)
+        self.pauseButton.setEnabled(False)
+        self.stopButton.setEnabled(False)
+        
         self.logger = logging.getLogger("log")
         self.handler = logging.FileHandler("log.txt")
         self.logger.addHandler(self.handler)
@@ -87,11 +93,20 @@ class mycrawl(QtGui.QMainWindow):
                 self.resultplainTextEdit.appendPlainText(u"\n-------finish--------\n")
                 self.statusLabel.setText(u"已结束") #改变运行状态Label
                 QtGui.QMessageBox.about(self, u"已结束", u"爬虫已结束")
+                self.startButton.setEnabled(True)
+                self.pauseButton.setEnabled(False)
+                self.stopButton.setEnabled(False)
 
         if stoped:
             #self.timer.singleShot(500, self.updateOutput) #500毫秒执行一次
             self.running = False
             self.timer.stop()
+
+    @QtCore.pyqtSlot()
+    def on_aboutsoftwareaction_triggered(self): #打开"关于about"
+        self.about1 = about()
+        if (self.about1.exec_()):
+            pass
 
     @QtCore.pyqtSlot()
     def on_newprojectaction_triggered(self): #新建一个scrapy项目
@@ -203,8 +218,11 @@ class mycrawl(QtGui.QMainWindow):
             f.write("\n\nnaming of saving: \n" + self.namingcomboBox.currentText().toUtf8())
 
     @QtCore.pyqtSlot()
-    def on_startButton_clicked(self): #开始爬取网页
+    def on_startButton_clicked(self): #开始爬取网页        
         if self.check_ready():
+            self.startButton.setEnabled(False)
+            self.pauseButton.setEnabled(True)
+            self.stopButton.setEnabled(True)
             self.write_setting()
         else:
             return
@@ -225,8 +243,9 @@ class mycrawl(QtGui.QMainWindow):
         self.spiderProcess = Process(target = spiderProcess_entry, args=(self.main_conn[1], self.ctrl_conn[1], self.result_conn[1], self.state_conn[1]))
         self.spiderProcess.start()
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(1) #切换当前标签页
         self.statusLabel.setText(u"正在运行") #改变运行状态Label
+        self.runtimeLabel.setText("00:00:00")
         self.requestcountLabel.setText("0")
         self.responsecountLabel.setText("0")
         self.responsebytesLabel.setText("0")
@@ -237,11 +256,16 @@ class mycrawl(QtGui.QMainWindow):
         #QtGui.QMessageBox.about(self, u"开始", u"开始爬取")
 
         self.main_conn[0].send(self.rule)
-        if self.main_conn[0].recv() == "start crawl":
-            #self.timer.singleShot(500, self.updateOutput)
-            self.running = True
-            self.runningtime = 0
-            self.timer.start(500)
+        while 1: #防止recv函数阻塞，防止界面假死
+            if self.main_conn[0].poll(): #查询pipe
+                if self.main_conn[0].recv() == "start crawl":
+                    #self.timer.singleShot(500, self.updateOutput)
+                    self.running = True
+                    self.runningtime = 0
+                    self.timer.start(500)
+                    break #跳出while循环
+            else:
+                QtGui.QApplication.processEvents() #强制处理事件循环
 
     @QtCore.pyqtSlot()
     def on_startprojectaction_triggered(self): #通过菜单开始爬取
@@ -253,11 +277,13 @@ class mycrawl(QtGui.QMainWindow):
             self.running = not self.running
             self.pauseButton.setText(u"恢复") #改变按钮文字
             self.statusLabel.setText(u"暂停") #改变运行状态Label
+            self.stopButton.setEnabled(False)
             self.ctrl_conn[0].send('pause crawl')
         else:
             self.running = not self.running
             self.pauseButton.setText(u"暂停") #改变按钮文字
             self.statusLabel.setText(u"正在运行") #改变运行状态Label
+            self.stopButton.setEnabled(True)
             self.ctrl_conn[0].send('unpause crawl')
 
     @QtCore.pyqtSlot()
@@ -267,6 +293,7 @@ class mycrawl(QtGui.QMainWindow):
     @QtCore.pyqtSlot()
     def on_stopButton_clicked(self): #停止爬取
         self.statusLabel.setText(u"正在停止") #改变运行状态Label
+        self.pauseButton.setEnabled(False)
         self.ctrl_conn[0].send('stop crawl')
 
     @QtCore.pyqtSlot()
@@ -425,19 +452,19 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action31_triggered(self): #打开"限定域的各类链接统计(downloaded)"文件
-        f = self.name + "/site links counts.csv"
+        f = self.name + "/domain links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action32_triggered(self): #打开"限定域间的链接统计(downloaded)"文件
-        f = self.name + "/site counts from-to.csv"
+        f = self.name + "/domain counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action33_triggered(self): #打开"限定域间的链接统计矩阵(downloaded)"文件
-        f = self.name + "/site matrix.csv"
+        f = self.name + "/domain matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
     @QtCore.pyqtSlot()
@@ -478,19 +505,19 @@ class mycrawl(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action71_triggered(self): #打开"限定域的各类链接统计(all)"文件
-        f = self.name + "/all site links counts.csv"
+        f = self.name + "/all domain links counts.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action72_triggered(self): #打开"限定域间的链接统计(all)"文件
-        f = self.name + "/all site counts from-to.csv"
+        f = self.name + "/all domain counts from-to.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
     @QtCore.pyqtSlot()
     def on_action73_triggered(self): #打开"限定域间的链接统计矩阵(all)"文件
-        f = self.name + "/all site matrix.csv"
+        f = self.name + "/all domain matrix.csv"
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
     @QtCore.pyqtSlot()
@@ -511,24 +538,36 @@ class mycrawl(QtGui.QMainWindow):
         f_path = os.path.abspath(f)
         self.opencsvfile(f_path)
 
+##    @QtCore.pyqtSlot()
+##    def on_documentationaction_triggered(self): #打开说明文档(关于生成的统计结果文件的说明)
+##        f = "Documentation.doc"
+##        f_path = os.path.abspath(f)
+##        if os.path.exists(f_path):
+##            try:
+##                if platform.system() == 'Windows':
+##                    word = win32com.client.Dispatch('Word.Application')
+##                    word.Visible = 1
+##                    word.Documents.Open(f_path)
+##                else:
+##                    os.system('xdg-open {0}'.format(f_path))
+##            except:
+##                QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
+##        else:
+##            QtGui.QMessageBox.about(self, u"找不到文件", u"找不到文件")
+
     @QtCore.pyqtSlot()
     def on_documentationaction_triggered(self): #打开说明文档(关于生成的统计结果文件的说明)
-        f = "Documentation.doc"
+        f = "Documentation.pdf"
         f_path = os.path.abspath(f)
         if os.path.exists(f_path):
             try:
-                if platform.system() == 'Windows':
-                    word = win32com.client.Dispatch('Word.Application')
-                    word.Visible = 1
-                    word.Documents.Open(f_path)
-                else:
-                    os.system('xdg-open {0}'.format(f_path))
+                webbrowser.open(f_path, new=0, autoraise=True)
             except:
                 QtGui.QMessageBox.about(self, u"无法打开文件", u"无法打开文件")
         else:
             QtGui.QMessageBox.about(self, u"找不到文件", u"找不到文件")
 
-
+        
 def spiderProcess_entry(main_conn, contrl_conn, result_conn, state_conn): #spider进程入口
     rule = main_conn.recv()
     main_conn.send("start crawl")
@@ -551,6 +590,7 @@ class MyThread(QtCore.QThread): #子线程,实现"生成统计结果"的功能
         lm.export_allitem_matrix() #生成基于爬取页面的统计结果
         
         self.sinPrompt.emit() #发送信号,表明功能已实现
+
 
         
 if __name__ == "__main__":

@@ -26,7 +26,9 @@ build_exe_options = {"packages":
         ("E:\\Python\\Python\\Lib\\site-packages\\scrapy\\mime.types","mime.types"),
 	("main.ui", "main.ui"),
 	("addurl.ui", "addurl.ui"),
+        ("about.ui", "about.ui"),
 	("projectname.ui", "projectname.ui"),
+        ("moon.ico", "moon.ico"),
         ("Documentation.doc", "Documentation.doc"),
         ("Documentation.pdf", "Documentation.pdf"),]
     }
@@ -37,8 +39,8 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-setup(  name = "Luna_spider",
+setup(  name = "LunaSpider",
         version = "1.0",
-        description = "spider program for IM College",
+        description = "LunaSpider", # "spider program for IM College"
         options = {"build_exe": build_exe_options},
-        executables = [Executable("Luna_spider.py", base=base, icon="Luna_spider.ico")])
+        executables = [Executable("LunaSpider.py", base=base, icon="moon.ico")])

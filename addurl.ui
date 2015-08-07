@@ -34,6 +34,10 @@
   <property name="windowTitle">
    <string>添加起始URL</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>moon.ico</normaloff>moon.ico</iconset>
+  </property>
   <widget class="QTabWidget" name="addurltabWidget">
    <property name="geometry">
     <rect>

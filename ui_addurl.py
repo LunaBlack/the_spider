@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'addurl.ui'
 #
-# Created: Mon Mar 16 05:41:47 2015
+# Created: Fri Jul 10 02:39:56 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -35,6 +35,9 @@ class Ui_addurlDialog(object):
         addurlDialog.setSizePolicy(sizePolicy)
         addurlDialog.setMinimumSize(QtCore.QSize(782, 507))
         addurlDialog.setMaximumSize(QtCore.QSize(782, 507))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("moon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        addurlDialog.setWindowIcon(icon)
         self.addurltabWidget = QtGui.QTabWidget(addurlDialog)
         self.addurltabWidget.setGeometry(QtCore.QRect(26, 19, 731, 261))
         font = QtGui.QFont()

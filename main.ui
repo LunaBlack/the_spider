@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Luna_spider</string>
+   <string>LunaSpider</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>moon.ico</normaloff>moon.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="centralLayout">
@@ -1009,7 +1013,6 @@ Xpath表达式</string>
      <string>帮助</string>
     </property>
     <addaction name="documentationaction"/>
-    <addaction name="helpdocumentaction"/>
     <addaction name="separator"/>
     <addaction name="aboutsoftwareaction"/>
    </widget>

@@ -352,7 +352,7 @@ class LinkMatrix():
             fields = ["Domain ", "Pages_1", "Pages_2", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in site_count.items():
+            for k,v in domain_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 #print(row)
@@ -465,7 +465,7 @@ class LinkMatrix():
         with open(self.projectname+"/link_struct.txt", "w") as f:
             lines = []
             for k,v in self.forwardlinks.items():
-                if len(v) > 1 or len(self.outlinks[k]) > 1:
+                if len(v) >= 1 or len(self.outlinks[k]) >= 1:
                     lines.append(k+'\n')
                     for r in v.keys():
                         lines.append("\t"+r+'\n')
@@ -478,7 +478,7 @@ class LinkMatrix():
         with open(self.projectname+"/inlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.forwardlinks.items():
-                if len(v) > 1:
+                if len(v) >= 1:
                     lines.append(k+'\n')
                     for r in v.keys():
                         lines.append("\t"+r+'\n')
@@ -489,7 +489,7 @@ class LinkMatrix():
         with open(self.projectname+"/outlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.outlinks.items():
-                if len(v) > 1:
+                if len(v) >= 1:
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')
@@ -646,7 +646,7 @@ class LinkMatrix():
             fields = ["Domain ", "Pages", "KnownLinks", "UnknownLinks", "InterLinks", "OutLinks"]
             writer = csv.DictWriter(f, fieldnames = fields)
             writer.writeheader()
-            for k,v in all_site_count.items():
+            for k,v in all_domain_count.items():
                 row = {fields[0]:k}
                 row.update(v)
                 #print(row)
@@ -757,7 +757,7 @@ class LinkMatrix():
         with open(self.projectname+"/all_link_struct.txt", "w") as f:
             lines = []
             for k,v in self.entire_struct.items():
-                if len(v) > 1 or ( k in self.outlinks_0.keys()):
+                if len(v) >= 1 or ( k in self.outlinks_0.keys()):
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')
@@ -771,7 +771,7 @@ class LinkMatrix():
         with open(self.projectname+"/all_inlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.entire_struct.items():
-                if len(v) > 1:
+                if len(v) >= 1:
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')
@@ -782,7 +782,7 @@ class LinkMatrix():
         with open(self.projectname+"/all_outlink_struct.txt", "w") as f:
             lines = []
             for k,v in self.outlinks_0.items():
-                if k in self.entire_struct.keys() and len(v) > 1:
+                if k in self.entire_struct.keys() and len(v) >= 1:
                     lines.append(k+'\n')
                     for r in v:
                         lines.append("\t"+r+'\n')

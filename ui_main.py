@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main.ui'
 #
-# Created: Fri Mar 27 21:38:11 2015
+# Created: Fri Jul 10 02:39:20 2015
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,6 +27,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(985, 656)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("moon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.centralLayout = QtGui.QVBoxLayout(self.centralwidget)
@@ -569,7 +572,6 @@ class Ui_MainWindow(object):
         self.filemenu.addSeparator()
         self.filemenu.addAction(self.exitsoftwareaction)
         self.helpmenu.addAction(self.documentationaction)
-        self.helpmenu.addAction(self.helpdocumentaction)
         self.helpmenu.addSeparator()
         self.helpmenu.addAction(self.aboutsoftwareaction)
         self.menu_1.addAction(self.action11)
@@ -620,7 +622,7 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(_translate("MainWindow", "Luna_spider", None))
+        MainWindow.setWindowTitle(_translate("MainWindow", "LunaSpider", None))
         self.urlgroupBox.setTitle(_translate("MainWindow", "起始URL", None))
         self.addurlButton.setText(_translate("MainWindow", "添加", None))
         self.emptyurlButton.setText(_translate("MainWindow", "清空", None))

@@ -24,12 +24,12 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
         self.linkmatrix.setroot(self.start_urls)
 
         self.allowed_domains = rs.readalloweddomain()
-        allow, deny = rs.readurlmatch()
+        self.allow, self.deny = rs.readurlmatch()
 
-        self.regex_allow = re.compile('({0})'.format('|'.join([re.escape(e) for e in allow]))) #生成正则表达式
-        self.regex_deny = re.compile('({0})'.format('|'.join([re.escape(e) for e in deny])))
+        self.regex_allow = re.compile('({0})'.format('|'.join([re.escape(e) for e in self.allow]))) #生成正则表达式
+        self.regex_deny = re.compile('({0})'.format('|'.join([re.escape(e) for e in self.deny])))
 
-        self.rules = [Rule( LinkExtractor(), follow=True, callback="parse_match")]
+        self.rules = [Rule(LinkExtractor(), follow=True, callback="parse_match")]
         #设置爬取规则:follow所有url;Request通过spidermiddlewares过滤掉限定域外的url;生成的response传递给parse_match
         #所有Request均经过spidermiddlewares
 
@@ -44,8 +44,8 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
         item['referer'] = response.request.headers['Referer']
         yield item
         
-        if bool(self.regex_allow.search(url)): #判断url是否满足allow条件
-            if not bool(self.regex_deny.search(url)): #判断url是否满足deny条件
+        if bool(self.regex_allow.search(url)): #判断url是否满足allow条件            
+            if not self.deny: #若未设置deny
                 item = CrawledItem() #满足下载条件,则生成CrawledItem
                 item['url'] = response.url
                 item['referer'] = response.request.headers['Referer']
@@ -58,5 +58,20 @@ class MatchSpider(CrawlSpider): #当url获取规则为“网址匹配及指定�
                         item['title'] = ''
                     item['body'] = response.body
                 yield item
+
+            else: #若设置了deny
+                if not bool(self.regex_deny.search(url)): #判断url是否满足deny条件
+                    item = CrawledItem() #满足下载条件,则生成CrawledItem
+                    item['url'] = response.url
+                    item['referer'] = response.request.headers['Referer']
+                    if isinstance(response, TextResponse):
+                        response.selector.remove_namespaces()
+                        title_exp = response.xpath("//title/text()").extract() #提取网页title
+                        if title_exp:
+                            item['title'] = title_exp[0].strip()
+                        else:
+                            item['title'] = ''
+                        item['body'] = response.body
+                    yield item
 
 
